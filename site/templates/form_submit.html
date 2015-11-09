@@ -13,7 +13,7 @@
         <div class="title">
             <h1>POST request with Flask</h1>
         </div>
-        
+
         <div id="content">
 
             <form method="post" action="{{ url_for('hello') }}">
@@ -60,10 +60,12 @@
               });
               </script>
 
-              <input type="text" name="x" id="x" disabled />
-              <input type="text" name="y" id="y" disabled />
-              <input type="text" name="width" id="width" disabled />
-              <input type="text" name="height" id="height" disabled />
+              <div>
+                  <input type="text" name="x" id="x" />
+                  <input type="text" name="y" id="y" />
+                  <input type="text" name="width" id="width" />
+                  <input type="text" name="height" id="height" />
+              </div>
 
               <br/>
               <input type="submit" />
