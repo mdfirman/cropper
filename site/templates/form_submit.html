@@ -11,7 +11,7 @@
 
     <div id="container">
         <div class="title">
-            <h1>POST request with Flask</h1>
+            <h1>POST request with Flask {{ img }}</h1>
         </div>
 
         <div id="content">
@@ -32,7 +32,7 @@
               Can you see the top of the wings, the bottom or both?
               <div class="form-group">
                   <label class="radio-inline"><input type="radio"
-                      name="topbottom" checked="checked"  value="Top">Top</label>
+                      name="topbottom" value="Top">Top</label>
                   <label class="radio-inline"><input type="radio"
                       name="topbottom" value="Bottom">Bottom</label>
                   <label class="radio-inline"><input type="radio"
@@ -43,18 +43,21 @@
               Draw a box around the butterfly:
 
               <div class="container">
-                <img width="50%" src="{{ url_for('static', filename='trucks.jpg') }}">
+                <img width="50%" src="{{ url_for('download_image', filename=imagename) }}">
               </div>
 
               <script>
               $('.container > img').cropper({
                 //aspectRatio: 16 / 9,
+                autoCrop: false,
                 crop: function(e) {
                   // Output the result data for cropping image.
                   document.getElementById("x").value = e.x;
                   document.getElementById("y").value = e.y;
                   document.getElementById("width").value = e.width;
                   document.getElementById("height").value = e.height;
+                  document.getElementById("submitter").disabled = false;
+
                 },
                 zoomable: false
               });
@@ -68,7 +71,7 @@
               </div>
 
               <br/>
-              <input type="submit" />
+              <input type="submit" id="submitter" disabled/>
             </form>
 
         </div>
