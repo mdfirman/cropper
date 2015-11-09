@@ -9,62 +9,66 @@
     <body>
 
 
-        <div id="container">
-            <div class="title">
-                <h1>POST request with Flask</h1>
-            </div>
-            <div id="content">
+    <div id="container">
+        <div class="title">
+            <h1>POST request with Flask</h1>
+        </div>
+        
+        <div id="content">
 
-                <form method="post" action="{{ url_for('hello') }}">
-                  <label for="yourname">Please enter your name:</label>
-                  <input type="text" name="yourname" /><br />
-                  <label for="youremail">Please enter your email:</label>
-                  <input type="text" name="youremail" id="output" /><br />
-                  <div class="form-group">
-                      <label class="radio-inline"><input type="radio" name="optradio" value="Zero">Zero</label>
-                      <label class="radio-inline"><input type="radio" name="optradio" checked="checked"  value="One">One</label>
-                      <label class="radio-inline"><input type="radio" name="optradio"  value="Many">Many</label>
-                  </div>
+            <form method="post" action="{{ url_for('hello') }}">
 
-                  <div class="container">
-                    <img width="50%" src="{{ url_for('static', filename='trucks.jpg') }}">
-                  </div>
-                  <span id="output">
-                    Hi
-                  </span>
-sdsds
-                  <script>
-                  $('.container > img').cropper({
-                    //aspectRatio: 16 / 9,
-                    crop: function(e) {
-                      // Output the result data for cropping image.
-                      console.log(e.x);
-                      console.log(e.y);
-                      console.log(e.width);
-                      console.log(e.height);
-                      console.log(e.rotate);
-                      console.log(e.scaleX);
-                      console.log(e.scaleY);
-                      document.getElementById("output").value = e.x;
-                    },
-                    zoomable: false
-                  });
-                  </script>
+              How many butterflies are in the image below?
+              <div class="form-group">
+                  <label class="radio-inline"><input type="radio"
+                      name="number_butterflies" value="Zero">Zero</label>
+                  <label class="radio-inline"><input type="radio"
+                      name="number_butterflies" checked="checked"  value="One">One</label>
+                  <label class="radio-inline"><input type="radio"
+                      name="number_butterflies"  value="Many">Many</label>
+              </div>
+              <br/>
 
+              Can you see the top of the wings, the bottom or both?
+              <div class="form-group">
+                  <label class="radio-inline"><input type="radio"
+                      name="topbottom" checked="checked"  value="Top">Top</label>
+                  <label class="radio-inline"><input type="radio"
+                      name="topbottom" value="Bottom">Bottom</label>
+                  <label class="radio-inline"><input type="radio"
+                      name="topbottom"  value="Both">Both</label>
+              </div>
+              <br/>
 
-                  <input type="submit" />
-                </form>
+              Draw a box around the butterfly:
 
-            </div>
-            <div class="title">
-                <h1>Flask code</h1>
-            </div>
-                <code><pre>
-@app.route('/')
-def form():
-    return render_template('form_submit.html')
-                </pre></code>
-            </div>
+              <div class="container">
+                <img width="50%" src="{{ url_for('static', filename='trucks.jpg') }}">
+              </div>
+
+              <script>
+              $('.container > img').cropper({
+                //aspectRatio: 16 / 9,
+                crop: function(e) {
+                  // Output the result data for cropping image.
+                  document.getElementById("x").value = e.x;
+                  document.getElementById("y").value = e.y;
+                  document.getElementById("width").value = e.width;
+                  document.getElementById("height").value = e.height;
+                },
+                zoomable: false
+              });
+              </script>
+
+              <input type="text" name="x" id="x" disabled />
+              <input type="text" name="y" id="y" disabled />
+              <input type="text" name="width" id="width" disabled />
+              <input type="text" name="height" id="height" disabled />
+
+              <br/>
+              <input type="submit" />
+            </form>
+
         </div>
     </body>
 </html>

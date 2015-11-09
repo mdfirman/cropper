@@ -17,14 +17,24 @@ def form():
 # accepting: POST requests in this case
 @app.route('/hello/', methods=['POST'])
 def hello():
-    name=request.form['yourname']
-    email=request.form['youremail']
-    rad=request.form['optradio']
-    rad=request.form['optradio']
-    print rad
-    with open('output.txt', 'w') as f:
-        yaml.dump(rad, f)
-    return render_template('form_action.html', name=name, email=email)
+    # name=request.form['yourname']
+    # email=request.form['youremail']
+
+    results = {
+        'number_butterflies': str(request.form['number_butterflies']),
+        'top_bottom': str(request.form['topbottom']),
+        'crop': {
+            'x': float(request.form['x']),
+            'y': float(request.form['y']),
+            'width': float(request.form['width']),
+            'height': float(request.form['height'])
+            }
+    }
+    print results
+    with open('output.yaml', 'w') as f:
+        yaml.dump(results, f, default_flow_style=False)
+
+    return render_template('form_submit.html')#, name=name, email=email)
 
 # Run the app :)
 if __name__ == '__main__':
