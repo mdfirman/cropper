@@ -16,7 +16,7 @@
 
         <div id="content">
 
-            <form method="post" action="{{ url_for('hello') }}">
+            <form method="post" action="{{ url_for('form_submission') }}">
 
               How many butterflies are in the image below?
               <div class="form-group">
@@ -42,8 +42,10 @@
 
               Draw a box around the butterfly:
 
+              {{ sighting_id }}
+              {{ img_id }}
               <div class="container">
-                <img width="50%" src="{{ url_for('download_image', filename=imagename) }}">
+                <img width="50%" src="{{ url_for('download_image', sighting_id=sighting_id, img_id=img_id) }}">
               </div>
 
               <script>
