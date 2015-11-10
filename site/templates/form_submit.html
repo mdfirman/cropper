@@ -1,36 +1,81 @@
 <html>
     <head>
-        <title>Handle POST requests with Flask</title>
+        <title>Butterfly cropping v0.1</title>
         <!-- <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"> -->
         <script src="{{ url_for('static', filename='jquery.js') }}"></script>
         <link  href="{{ url_for('static', filename='cropper.min.css') }}" rel="stylesheet">
         <script src="{{ url_for('static', filename='cropper.min.js') }}"></script>
+        <script type="text/javascript" language="javascript">
+            function wings_checked()
+            {
+                var chx = document.getElementsByName('topbottom');
+                for (var i=0; i<chx.length; i++) {
+                // If you have more than one radio group, also check the name attribute
+                // for the one you want as in && chx[i].name == 'choose'
+                // Return true from the function on first match of a checked item
+                    if (chx[i].type == 'radio' && chx[i].checked) {
+                        return true;
+                    }
+                }
+            }
+
+            function bad_image()
+            {
+                return !document.getElementById("one_butterfly").checked
+            }
+
+            function cropped()
+            {
+                return document.getElementById("x").value != ""
+            }
+
+            // http://stackoverflow.com/questions/13931688/disable-enable-submit-button-until-all-forms-have-been-filled
+            function checkform()
+            {
+                var f = document.forms["main_form"].elements;
+                var cansubmit = (wings_checked() && cropped()) || bad_image();
+                document.getElementById('submitter').disabled = !cansubmit;
+            }
+
+            document.addEventListener('keydown', function(event) {
+                console.log(event.keyCode)
+                if (event.keyCode == 90) { // 90 = 'z'
+                    document.getElementById("zero_butterflies").checked = "checked";
+                    checkform()
+                    document.getElementById("main_form").submit();
+                }
+            }, true);
+        </script>
     </head>
     <body>
 
 
     <div id="container">
         <div class="title">
-            <h1>POST request with Flask {{ img }}</h1>
+            <h1>Cropping butterflies</h1>
         </div>
 
         <div id="content">
 
-            <form method="post" action="{{ url_for('form_submission') }}">
+            <form id="main_form" method="post" action="{{ url_for('form_submission') }}">
+
+
 
               How many butterflies are in the image below?
-              <div class="form-group">
+              <div class="form-group" onclick="checkform()">
                   <label class="radio-inline"><input type="radio"
-                      name="number_butterflies" value="Zero">Zero</label>
+                      name="number_butterflies" id="zero_butterflies"
+                      value="Zero">Zero</label>
                   <label class="radio-inline"><input type="radio"
-                      name="number_butterflies" checked="checked"  value="One">One</label>
+                      name="number_butterflies" checked="checked"
+                      value="One" id="one_butterfly">One</label>
                   <label class="radio-inline"><input type="radio"
                       name="number_butterflies"  value="Many">Many</label>
               </div>
               <br/>
 
               Can you see the top of the wings, the bottom or both?
-              <div class="form-group">
+              <div class="form-group" onclick="checkform()">
                   <label class="radio-inline"><input type="radio"
                       name="topbottom" value="Top">Top</label>
                   <label class="radio-inline"><input type="radio"
@@ -40,10 +85,12 @@
               </div>
               <br/>
 
+              <input type="submit" id="submitter" disabled/>
+
+              <br/>
+              <br/>
               Draw a box around the butterfly:
 
-              {{ sighting_id }}
-              {{ img_id }}
               <div class="container">
                 <img width="50%" src="{{ url_for('download_image', sighting_id=sighting_id, img_id=img_id) }}">
               </div>
@@ -59,21 +106,31 @@
                   document.getElementById("width").value = e.width;
                   document.getElementById("height").value = e.height;
                   document.getElementById("submitter").disabled = false;
-
+                  checkform()
                 },
                 zoomable: false
               });
               </script>
 
               <div>
-                  <input type="text" name="x" id="x" />
-                  <input type="text" name="y" id="y" />
-                  <input type="text" name="width" id="width" />
-                  <input type="text" name="height" id="height" />
+                  <input type="text" name="x" id="x" hidden />
+                  <input type="text" name="y" id="y" hidden />
+                  <input type="text" name="width" id="width" hidden />
+                  <input type="text" name="height" id="height" hidden />
+                  <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} hidden />
+                  <input type="text" name="img_id" id="img_id" value={{ img_id }} hidden />
               </div>
 
               <br/>
-              <input type="submit" id="submitter" disabled/>
+              Sighting ID: {{ sighting_id }}
+              <br/>
+              Image ID: {{ img_id }}
+              <br/>
+              <br/>
+              <emph>Shortcuts: No butterfly: 'z'</emph>
+
+
+
             </form>
 
         </div>
