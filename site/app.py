@@ -99,6 +99,7 @@ def form_submission():
             'width': float(request.form['width']),
             'height': float(request.form['height'])
         }
+        results['notes'] = str(request.form['notes'])
     except:
         pass
 
@@ -113,6 +114,7 @@ def form_submission():
 
     # get a new image from the set of unlabelled images
     new_sighting_id, new_img_id = get_new_images()
+    print "Loading : ", new_sighting_id, new_img_id
 
     if new_sighting_id is None:
         return render_template('form_finished.html')
