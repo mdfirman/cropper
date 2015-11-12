@@ -4,7 +4,7 @@
 from flask import Flask, render_template, request, url_for, send_from_directory
 import yaml
 import os
-import random
+import glob
 from time import time
 
 # Initialize the Flask application
@@ -14,7 +14,7 @@ global tic
 tic = time()
 
 data_dir = ('/home/michael/projects/butterflies/data/web_scraping/'
-            'ispot/sightings_subset/')
+            'ispot/sightings/')
 
 
 def build_unlabelled_img_set():
@@ -24,15 +24,17 @@ def build_unlabelled_img_set():
     '''
     unlabelled_imgs = set()
 
-    for sighting_id in os.listdir(data_dir):
+    # yaml_paths = glob.glob(data_dir + '*/*meta.yaml')
+    sighting_ids = yaml.load(
+        open(data_dir + '../butterflies.yaml'), Loader=yaml.CLoader)
 
-        meta = yaml.load(open(data_dir + sighting_id + '/meta.yaml'))
+    for sighting_id, img_id, img_name in sighting_ids:
 
-        for img_id in meta['ImageIds']:
-            crop_path = data_dir + sighting_id + '/' + img_id + '_crop.yaml'
+        crop_path = data_dir + sighting_id + '/' + img_id + '_crop.yaml'
 
-            if not os.path.exists(crop_path):
-                unlabelled_imgs.add((sighting_id, img_id))
+        # could run glob.glob on data_dir just once to speed this up
+        if not os.path.exists(crop_path):
+            unlabelled_imgs.add((sighting_id, img_id, img_name))
 
     return unlabelled_imgs
 
@@ -44,7 +46,8 @@ unlabelled_imgs = build_unlabelled_img_set()
 @app.route('/<sighting_id>/<img_id>')
 def download_image(sighting_id, img_id):
     print sighting_id, img_id
-    return send_from_directory(data_dir + sighting_id, img_id + '.jpg',
+    print "In app", data_dir + sighting_id, img_id
+    return send_from_directory(data_dir + sighting_id, img_id,
         as_attachment=True)
 
 
@@ -70,9 +73,11 @@ def form():
     """
     global tic, unlabelled_imgs
     tic = time()
-    new_sighting_id, new_img_id = get_new_images()
+    T = get_new_images()
+    print T
+    new_sighting_id, new_img_id, new_img_name = T
     return render_template('form_submit.html', sighting_id=new_sighting_id,
-        img_id=new_img_id)
+        img_id=new_img_name)
 
 
 # Define a route for the action of the form, for example '/hello/'
@@ -113,7 +118,7 @@ def form_submission():
         yaml.dump(results, f, default_flow_style=False)
 
     # get a new image from the set of unlabelled images
-    new_sighting_id, new_img_id = get_new_images()
+    new_sighting_id, new_img_id, new_img_name = get_new_images()
     print "Loading : ", new_sighting_id, new_img_id
 
     if new_sighting_id is None:
@@ -121,8 +126,9 @@ def form_submission():
     else:
         # start the clock and render the new page
         tic = time()
+        print new_img_name
         return render_template('form_submit.html', sighting_id=new_sighting_id,
-            img_id=new_img_id)
+            img_id=new_img_name)
 
 
 

@@ -2,11 +2,11 @@
     <head>
         <title>Butterfly cropping v0.1</title>
         <!-- <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"> -->
-        <script src="{{ url_for('static', filename='jquery.js') }}"></script>
-        <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+        <script src="{{ url_for('static', filename='jquery.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename='bootstrap.js') }}" type="text/javascript"></script>
         <link  href="{{ url_for('static', filename='bootstrap-theme.min.css') }}" rel="stylesheet">
         <link  href="{{ url_for('static', filename='cropper.min.css') }}" rel="stylesheet">
-        <script src="{{ url_for('static', filename='cropper.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='cropper.min.js') }}" type="text/javascript"></script>
         <script type="text/javascript" language="javascript">
             function wings_checked()
             {
@@ -119,8 +119,8 @@
                   <input type="text" name="y" id="y" hidden />
                   <input type="text" name="width" id="width" hidden />
                   <input type="text" name="height" id="height" hidden />
-                  <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} hidden />
-                  <input type="text" name="img_id" id="img_id" value={{ img_id }} hidden />
+                  <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} />
+                  <input type="text" name="img_id" id="img_id" value={{ img_id }}  />
                   <br/>
                   Enter notes here:
                   <br/>
@@ -140,5 +140,6 @@
             </form>
 
         </div>
+    </div>
     </body>
 </html>
