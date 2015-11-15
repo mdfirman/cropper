@@ -13,8 +13,9 @@ app = Flask(__name__)
 global tic
 tic = time()
 
-data_dir = ('/home/michael/projects/butterflies/data/web_scraping/'
-            'ispot/sightings/')
+# data_dir = ('/home/michael/projects/butterflies/data/web_scraping/'
+            # 'ispot/sightings/')
+data_dir = '/Users/Michael/projects/engage/butterflies/data/ispot/sightings/'
 
 
 def build_unlabelled_img_set():
@@ -35,6 +36,8 @@ def build_unlabelled_img_set():
         # could run glob.glob on data_dir just once to speed this up
         if not os.path.exists(crop_path):
             unlabelled_imgs.add((sighting_id, img_id, img_name))
+        else:
+            print "Labelled:", crop_path
 
     return unlabelled_imgs
 
@@ -111,7 +114,7 @@ def form_submission():
     # save the results to disk
     sighting_id = request.form['sighting_id']
     img_id = request.form['img_id']
-    savepath = data_dir + sighting_id + '/' + img_id + '_crop.yaml'
+    savepath = data_dir + sighting_id + '/' + img_id.split('.')[0] + '_crop.yaml'
 
     print "Saving results to ", savepath
     with open(savepath, 'w') as f:
