@@ -13,8 +13,7 @@ app = Flask(__name__)
 global tic
 tic = time()
 
-data_dir = ('/home/michael/projects/butterflies/data/web_scraping/'
-            'ispot/sightings/')
+data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings/')
 # data_dir = '/Users/Michael/projects/engage/butterflies/data/ispot/sightings/'
 
 
