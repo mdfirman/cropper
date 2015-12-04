@@ -17,6 +17,13 @@ data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings/
 # data_dir = '/Users/Michael/projects/engage/butterflies/data/ispot/sightings/'
 
 
+def extract_latin_name(name):
+    if '(' in name:# and ')' in name:
+        return name.split('(')[1].split(')')[0].strip().lower()
+    else:
+        return name.lower()
+
+
 def build_unlabelled_img_set():
     '''
     Returns set of unlabelled images, consisting of tuples of
@@ -30,13 +37,24 @@ def build_unlabelled_img_set():
 
     for sighting_id, img_id, img_name in sighting_ids:
 
+        if ' ' in img_id:
+            continue
+
+        meta = yaml.load(open(data_dir + sighting_id + '/meta.yaml'),
+            Loader=yaml.CLoader)
+
+        likely_id = extract_latin_name(meta['meta_tags']['likely_id'])
+
+        if likely_id != "pieris brassicae":
+            continue
+
         crop_path = data_dir + sighting_id + '/' + img_id + '_crop.yaml'
 
         # could run glob.glob on data_dir just once to speed this up
         if not os.path.exists(crop_path):
             unlabelled_imgs.add((sighting_id, img_id, img_name))
         else:
-            print "Labelled:", crop_path
+            pass
 
     return unlabelled_imgs
 
@@ -62,7 +80,7 @@ def get_new_images():
 
         # now check again, if still empty then we're done
         if not unlabelled_imgs:
-            return None, None
+            return None, None, None
 
     return unlabelled_imgs.pop()
 
@@ -76,7 +94,7 @@ def form():
     global tic, unlabelled_imgs
     tic = time()
     T = get_new_images()
-    print T
+    print "T is ", T
     new_sighting_id, new_img_id, new_img_name = T
     return render_template('form_submit.html', sighting_id=new_sighting_id,
         img_id=new_img_name)
