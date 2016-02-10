@@ -1,0 +1,4 @@
+#imageholder div{ background-color:black;position:absolute; }
+#imageholder{;position:relative;display:inline-block;overflow:hidden; }
+#horizontal{width:100%;height:1px;}
+#vertical{width:1px;height:100%;}

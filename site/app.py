@@ -13,8 +13,14 @@ app = Flask(__name__)
 global tic
 tic = time()
 
-data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings/'
-# data_dir = '/Users/Michael/projects/engage/butterflies/data/ispot/sightings/'
+debug = True
+
+if debug:
+    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
+    yaml_name = 'sightings_subset.yaml'
+else:
+    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/butterfly_subset/'
+    yaml_name = 'butterflies.yaml'
 
 
 def extract_latin_name(name):
@@ -33,10 +39,11 @@ def build_unlabelled_img_set():
 
     # yaml_paths = glob.glob(data_dir + '*/*meta.yaml')
     sighting_ids = yaml.load(
-        open(data_dir + '../butterflies.yaml'), Loader=yaml.CLoader)
+        open(data_dir + '../' + yaml_name), Loader=yaml.CLoader)
 
     for sighting_id, img_id, img_name in sighting_ids:
 
+        # skip images with spaces, these are kind of broken
         if ' ' in img_id:
             continue
 
@@ -45,8 +52,8 @@ def build_unlabelled_img_set():
 
         likely_id = extract_latin_name(meta['meta_tags']['likely_id'])
 
-        if likely_id != "pieris brassicae":
-            continue
+        # if likely_id != "pieris brassicae":
+        #     continue
 
         crop_path = data_dir + sighting_id + '/' + img_id + '_crop.yaml'
 
@@ -55,6 +62,9 @@ def build_unlabelled_img_set():
             unlabelled_imgs.add((sighting_id, img_id, img_name))
         else:
             pass
+
+    if len(unlabelled_imgs) == 0:
+        print "No unlabelled images!"
 
     return unlabelled_imgs
 
@@ -111,6 +121,7 @@ def form_submission():
 
     global tic
 
+    # print "Getting form", request.form['option1']
     # get the results from the form
     results = {
         'number_butterflies': str(request.form['number_butterflies']),
