@@ -1,14 +1,8 @@
 import yaml
 import os
-
-debug = True
-
-if debug:
-    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
-    yaml_name = 'sightings_subset.yaml'
-else:
-    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/butterfly_subset/'
-    yaml_name = 'butterflies.yaml'
+import operator
+import glob
+import collections
 
 
 def extract_latin_name(name):
@@ -18,7 +12,7 @@ def extract_latin_name(name):
         return name.lower()
 
 
-def build_unlabelled_img_set():
+def build_unlabelled_img_set(data_dir, yaml_name):
     '''
     Returns set of unlabelled images, consisting of tuples of
     (sightingID, imageID)
@@ -55,3 +49,23 @@ def build_unlabelled_img_set():
         print "No unlabelled images!"
 
     return unlabelled_imgs
+
+
+def get_user_counts(data_dir):
+    '''
+    returns a list of users and an equivalent list of their counts,
+    sorted so the most prolific users are last in the list
+    '''
+    uname_counts = collections.defaultdict(int)
+
+    fnames = glob.glob(data_dir + '/*/*_crop.yaml')
+    for fname in fnames:
+        crop = yaml.load(open(fname))
+        if 'username' in crop:
+            uname_counts[crop['username']] += 1
+
+    # sorting users
+    sorted_users = sorted(uname_counts.items(), key=operator.itemgetter(1))
+
+    unames, counts = zip(*sorted_users)
+    return unames, counts

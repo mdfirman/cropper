@@ -5,13 +5,12 @@ from flask import Flask, render_template, request, url_for, send_from_directory
 import yaml
 import os
 import glob
-from time import time
+import time
 
 
 # Initialize the Flask application
 app = Flask(__name__)
 
-from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask import flash, redirect
 
@@ -20,8 +19,18 @@ from flask import Flask,session, request, flash, url_for, redirect, render_templ
 from flask.ext.login import login_user , logout_user , current_user , login_required
 from flask.ext.login import LoginManager
 
-from butterfly_file_handlers import build_unlabelled_img_set
+from butterfly_file_handlers import build_unlabelled_img_set, get_user_counts
 from userclass import User
+
+
+import random
+import StringIO
+
+from flask import make_response
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -29,10 +38,55 @@ login_manager.init_app(app)
 db = SQLAlchemy(app)
 
 global tic
-tic = time()
+tic = time.time()
+
+debug = True
+
+
+if debug:
+    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
+    yaml_name = 'sightings_subset.yaml'
+else:
+    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/butterfly_subset/'
+    yaml_name = 'butterflies.yaml'
 
 global unlabelled_imgs
-unlabelled_imgs = build_unlabelled_img_set()
+unlabelled_imgs = build_unlabelled_img_set(data_dir, yaml_name)
+
+
+
+@app.route('/leaderboard_im.png')
+def leaderboard_im():
+    unames, counts = get_user_counts(data_dir)
+
+    ypos = np.arange(len(unames))
+
+    # plotting bar graph
+    fig = plt.figure(figsize=(8, 0.5+len(unames)/1.5))
+    plt.barh(ypos, counts, align='center', height=0.8)
+    plt.yticks(ypos, unames, fontsize=20)
+
+    # enforce integer only xticks
+    ya = plt.gca().get_xaxis()
+    ya.set_major_locator(plt.MaxNLocator(integer=True))
+
+    # moving axis to top
+    plt.gca().xaxis.tick_top()
+    plt.subplots_adjust(left=0.3, right=0.9, top=0.7, bottom=0.2)
+
+    # # xtick fontsize
+    plt.gca().tick_params(axis='x', which='major', labelsize=16)
+
+    # white background
+    plt.gca().set_axis_bgcolor((1, 1, 1))
+
+    canvas = FigureCanvas(fig)
+    output = StringIO.StringIO()
+    canvas.print_png(output)
+    response = make_response(output.getvalue())
+    response.mimetype = 'image/png'
+    return response
+
 
 
 # this gets a specific image file, and is used in the form_submit.html
@@ -49,7 +103,7 @@ def get_new_images():
 
     if not unlabelled_imgs:
         # might have run out, or might have missed one. Check all the files...
-        unlabelled_imgs = build_unlabelled_img_set()
+        unlabelled_imgs = build_unlabelled_img_set(data_dir, yaml_name)
 
         # now check again, if still empty then we're done
         if not unlabelled_imgs:
@@ -66,13 +120,17 @@ def form():
     This is run the first time the page is loaded
     """
     global tic, unlabelled_imgs
-    tic = time()
+    tic = time.time()
     T = get_new_images()
     print "T is ", T
     new_sighting_id, new_img_id, new_img_name = T
     return render_template('form_submit.html', sighting_id=new_sighting_id,
         img_id=new_img_name)
 
+
+@app.route('/leaderboard')
+def leaderboard():
+    return render_template('leaderboard.html')
 
 # Define a route for the action of the form, for example '/hello/'
 # We are also defining which type of requests this route is
@@ -89,7 +147,9 @@ def form_submission():
     # get the results from the form
     results = {
         'number_butterflies': str(request.form['number_butterflies']),
-        'time_taken': time() - tic
+        'time_taken': time.time() - tic,
+        'username': g.user.username,
+        'datetime': time.time()
     }
     try:
         results['top_bottom'] = str(request.form['topbottom'])
@@ -110,7 +170,7 @@ def form_submission():
 
     print "Saving results to ", savepath
     with open(savepath, 'w') as f:
-        yaml.dump(results, f, default_flow_style=False)
+        yaml.dump(results, f)
 
     # get a new image from the set of unlabelled images
     new_sighting_id, new_img_id, new_img_name = get_new_images()
@@ -120,7 +180,7 @@ def form_submission():
         return render_template('form_finished.html')
     else:
         # start the clock and render the new page
-        tic = time()
+        tic = time.time()
         print new_img_name
         return render_template('form_submit.html', sighting_id=new_sighting_id,
             img_id=new_img_name)
