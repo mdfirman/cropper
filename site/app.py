@@ -6,7 +6,7 @@ import yaml
 import os
 import glob
 from time import time
-import bcrypt
+
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -18,9 +18,10 @@ from flask import flash, redirect
 
 from flask import Flask,session, request, flash, url_for, redirect, render_template, abort ,g
 from flask.ext.login import login_user , logout_user , current_user , login_required
-
-
 from flask.ext.login import LoginManager
+
+from butterfly_file_handlers import build_unlabelled_img_set
+from userclass import User
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -29,62 +30,6 @@ db = SQLAlchemy(app)
 
 global tic
 tic = time()
-
-debug = True
-
-if debug:
-    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
-    yaml_name = 'sightings_subset.yaml'
-else:
-    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/butterfly_subset/'
-    yaml_name = 'butterflies.yaml'
-
-
-def extract_latin_name(name):
-    if '(' in name:# and ')' in name:
-        return name.split('(')[1].split(')')[0].strip().lower()
-    else:
-        return name.lower()
-
-
-def build_unlabelled_img_set():
-    '''
-    Returns set of unlabelled images, consisting of tuples of
-    (sightingID, imageID)
-    '''
-    unlabelled_imgs = set()
-
-    # yaml_paths = glob.glob(data_dir + '*/*meta.yaml')
-    sighting_ids = yaml.load(
-        open(data_dir + '../' + yaml_name), Loader=yaml.CLoader)
-
-    for sighting_id, img_id, img_name in sighting_ids:
-
-        # skip images with spaces, these are kind of broken
-        if ' ' in img_id:
-            continue
-
-        meta = yaml.load(open(data_dir + sighting_id + '/meta.yaml'),
-            Loader=yaml.CLoader)
-
-        likely_id = extract_latin_name(meta['meta_tags']['likely_id'])
-
-        # if likely_id != "pieris brassicae":
-        #     continue
-
-        crop_path = data_dir + sighting_id + '/' + img_id + '_crop.yaml'
-
-        # could run glob.glob on data_dir just once to speed this up
-        if not os.path.exists(crop_path):
-            unlabelled_imgs.add((sighting_id, img_id, img_name))
-        else:
-            pass
-
-    if len(unlabelled_imgs) == 0:
-        print "No unlabelled images!"
-
-    return unlabelled_imgs
-
 
 global unlabelled_imgs
 unlabelled_imgs = build_unlabelled_img_set()
@@ -114,7 +59,7 @@ def get_new_images():
 
 
 # Define a route for the default URL, which loads the form
-@app.route('/')
+@app.route('/cropper')
 @login_required
 def form():
     """
@@ -132,7 +77,7 @@ def form():
 # Define a route for the action of the form, for example '/hello/'
 # We are also defining which type of requests this route is
 # accepting: POST requests in this case
-@app.route('/', methods=['POST'])
+@app.route('/cropper', methods=['POST'])
 @login_required
 def form_submission():
     """
@@ -179,75 +124,6 @@ def form_submission():
         print new_img_name
         return render_template('form_submit.html', sighting_id=new_sighting_id,
             img_id=new_img_name)
-
-
-class User():
-    # __tablename__ = "users"
-    # id = db.Column('user_id',db.Integer , primary_key=True)
-    # username = db.Column('username', db.String(20), unique=True , index=True)
-    # password = db.Column('password' , db.String(10))
-    # email = db.Column('email',db.String(50),unique=True , index=True)
-    # registered_on = db.Column('registered_on' , db.DateTime)
-
-    def __init__(self):
-        pass
-
-    @classmethod
-    def new_user(cls, username, password, email):
-        usr = cls()
-        usr.username = username
-        usr.id = username
-        # hash password immediately
-        usr.salt = bcrypt.gensalt()
-        usr.hashed_password = bcrypt.hashpw(password, usr.salt)
-        usr.email = email
-        usr.registered_on = datetime.utcnow()
-        return usr
-
-    # overload init
-    @classmethod
-    def from_dict(cls, dic):
-        usr = cls()
-        usr.__dict__ = dic
-        usr.id = usr.username
-        return usr
-
-    @classmethod
-    def from_id(cls, id):
-        foldername = '../users/'
-        fname = foldername + id + '.yaml'
-        print "Loading"
-        # check user exists in our 'database'
-        if os.path.exists(fname):
-            # load user from file
-            return  User.from_dict(yaml.load(open(fname)))
-        else:
-            return None
-
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return unicode(self.id)
-
-    def __repr__(self):
-        return '<User %r, pw: %s>' % (self.username, self.hashed_password)
-
-    def dump(self, foldername='../users/'):
-        fname = foldername + self.username + '.yaml'
-        yaml.dump(self.__dict__, open(fname, 'w'))
-
-    def pw_correct(self, pw_guess):
-        hashed_guess = bcrypt.hashpw(pw_guess, self.salt)
-        correct = self.hashed_password == hashed_guess
-        print "Correct: ", correct
-        return correct
 
 
 @login_manager.user_loader
