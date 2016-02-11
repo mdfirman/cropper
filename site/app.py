@@ -6,9 +6,26 @@ import yaml
 import os
 import glob
 from time import time
+import bcrypt
 
 # Initialize the Flask application
 app = Flask(__name__)
+
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from flask import flash, redirect
+
+
+from flask import Flask,session, request, flash, url_for, redirect, render_template, abort ,g
+from flask.ext.login import login_user , logout_user , current_user , login_required
+
+
+from flask.ext.login import LoginManager
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+db = SQLAlchemy(app)
 
 global tic
 tic = time()
@@ -73,6 +90,7 @@ global unlabelled_imgs
 unlabelled_imgs = build_unlabelled_img_set()
 
 
+# this gets a specific image file, and is used in the form_submit.html
 @app.route('/<sighting_id>/<img_id>')
 def download_image(sighting_id, img_id):
     print sighting_id, img_id
@@ -97,6 +115,7 @@ def get_new_images():
 
 # Define a route for the default URL, which loads the form
 @app.route('/')
+@login_required
 def form():
     """
     This is run the first time the page is loaded
@@ -114,11 +133,11 @@ def form():
 # We are also defining which type of requests this route is
 # accepting: POST requests in this case
 @app.route('/', methods=['POST'])
+@login_required
 def form_submission():
     """
     This is run when the user clicks 'submit'
     """
-
     global tic
 
     # print "Getting form", request.form['option1']
@@ -162,9 +181,143 @@ def form_submission():
             img_id=new_img_name)
 
 
+class User():
+    # __tablename__ = "users"
+    # id = db.Column('user_id',db.Integer , primary_key=True)
+    # username = db.Column('username', db.String(20), unique=True , index=True)
+    # password = db.Column('password' , db.String(10))
+    # email = db.Column('email',db.String(50),unique=True , index=True)
+    # registered_on = db.Column('registered_on' , db.DateTime)
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def new_user(cls, username, password, email):
+        usr = cls()
+        usr.username = username
+        usr.id = username
+        # hash password immediately
+        usr.salt = bcrypt.gensalt()
+        usr.hashed_password = bcrypt.hashpw(password, usr.salt)
+        usr.email = email
+        usr.registered_on = datetime.utcnow()
+        return usr
+
+    # overload init
+    @classmethod
+    def from_dict(cls, dic):
+        usr = cls()
+        usr.__dict__ = dic
+        usr.id = usr.username
+        return usr
+
+    @classmethod
+    def from_id(cls, id):
+        foldername = '../users/'
+        fname = foldername + id + '.yaml'
+        print "Loading"
+        # check user exists in our 'database'
+        if os.path.exists(fname):
+            # load user from file
+            return  User.from_dict(yaml.load(open(fname)))
+        else:
+            return None
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return unicode(self.id)
+
+    def __repr__(self):
+        return '<User %r, pw: %s>' % (self.username, self.hashed_password)
+
+    def dump(self, foldername='../users/'):
+        fname = foldername + self.username + '.yaml'
+        yaml.dump(self.__dict__, open(fname, 'w'))
+
+    def pw_correct(self, pw_guess):
+        hashed_guess = bcrypt.hashpw(pw_guess, self.salt)
+        correct = self.hashed_password == hashed_guess
+        print "Correct: ", correct
+        return correct
+
+
+@login_manager.user_loader
+def load_user(id):
+    return User.from_id(id)
+
+
+@app.route('/register' , methods=['GET','POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('register.html')
+    user = User.new_user(request.form['username'] , request.form['password'],request.form['email'])
+    print user
+
+    # todo - check if user exists
+
+    user.dump()
+    # db.session.add(user)
+    # db.session.commit()
+    flash('User successfully registered')
+    print 'User successfully registered'
+    return redirect(url_for('login'))
+
+
+def load_user(username, password):
+
+    user = User.from_id(username)
+
+    if user and user.pw_correct(password):
+        return user
+    else:
+        return None
+
+@app.route('/index')
+@login_required
+def index():
+    print "Username", g.user.username
+    return render_template('index.html')
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+@app.route('/login',methods=['GET','POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    username = request.form['username']
+    password = request.form['password']
+    registered_user = load_user(username, password)
+
+    if registered_user is None:
+        flash('Username or Password is invalid' , 'error')
+
+        return redirect(url_for('login'))
+    login_user(registered_user)
+    flash('Logged in successfully')
+    return redirect(request.args.get('next') or url_for('index'))
+
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 # Run the app :)
 if __name__ == '__main__':
+    app.secret_key = 'super secret key'
     app.run(
         debug=True
         # host="0.0.0.0",
