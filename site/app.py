@@ -15,14 +15,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import flash, redirect
 
 
-from flask import Flask,session, request, flash, url_for, redirect, render_template, abort ,g
+from flask import Flask,session, request, flash, url_for, redirect, render_template, abort ,g, Blueprint
 from flask.ext.login import login_user , logout_user , current_user , login_required
 from flask.ext.login import LoginManager
 
 from butterfly_file_handlers import build_unlabelled_img_set, get_user_counts
 from userclass import User
 
-
+import chartkick
 import random
 import StringIO
 
@@ -42,6 +42,11 @@ tic = time.time()
 
 debug = True
 
+# adding chartkick
+ck = Blueprint('ck_page', __name__, static_folder=chartkick.js(), static_url_path='/static')
+app.register_blueprint(ck, url_prefix='/ck')
+app.jinja_env.add_extension("chartkick.ext.charts")
+
 
 if debug:
     data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
@@ -52,41 +57,6 @@ else:
 
 global unlabelled_imgs
 unlabelled_imgs = build_unlabelled_img_set(data_dir, yaml_name)
-
-
-
-@app.route('/leaderboard_im.png')
-def leaderboard_im():
-    unames, counts = get_user_counts(data_dir)
-
-    ypos = np.arange(len(unames))
-
-    # plotting bar graph
-    fig = plt.figure(figsize=(8, 0.5+len(unames)/1.5))
-    plt.barh(ypos, counts, align='center', height=0.8)
-    plt.yticks(ypos, unames, fontsize=20)
-
-    # enforce integer only xticks
-    ya = plt.gca().get_xaxis()
-    ya.set_major_locator(plt.MaxNLocator(integer=True))
-
-    # moving axis to top
-    plt.gca().xaxis.tick_top()
-    plt.subplots_adjust(left=0.3, right=0.9, top=0.7, bottom=0.2)
-
-    # # xtick fontsize
-    plt.gca().tick_params(axis='x', which='major', labelsize=16)
-
-    # white background
-    plt.gca().set_axis_bgcolor((1, 1, 1))
-
-    canvas = FigureCanvas(fig)
-    output = StringIO.StringIO()
-    canvas.print_png(output)
-    response = make_response(output.getvalue())
-    response.mimetype = 'image/png'
-    return response
-
 
 
 # this gets a specific image file, and is used in the form_submit.html
@@ -130,7 +100,10 @@ def form():
 
 @app.route('/leaderboard')
 def leaderboard():
-    return render_template('leaderboard.html')
+    user_counts = get_user_counts(data_dir)
+    user_counts.append(('hello', 5))
+    user_counts = [[str(xx), float(yy)] for xx, yy in user_counts][::-1]
+    return render_template('leaderboard.html', user_counts=user_counts)
 
 # Define a route for the action of the form, for example '/hello/'
 # We are also defining which type of requests this route is
@@ -195,17 +168,15 @@ def load_user(id):
 def register():
     if request.method == 'GET':
         return render_template('register.html')
+
     user = User.new_user(request.form['username'] , request.form['password'],request.form['email'])
-    print user
 
     # todo - check if user exists
-
-    user.dump()
-    # db.session.add(user)
-    # db.session.commit()
-    flash('User successfully registered')
-    print 'User successfully registered'
-    return redirect(url_for('login'))
+    if user:
+        user.dump()
+        return render_template('login.html')
+    else:
+        return render_template('register.html', error = "Error - user already exists")
 
 
 def load_user(username, password):
@@ -239,9 +210,8 @@ def login():
     registered_user = load_user(username, password)
 
     if registered_user is None:
-        flash('Username or Password is invalid' , 'error')
+        return render_template('login.html', error = "Error - Username or Password is invalid")
 
-        return redirect(url_for('login'))
     login_user(registered_user)
     flash('Logged in successfully')
     return redirect(request.args.get('next') or url_for('index'))

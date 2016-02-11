@@ -66,6 +66,7 @@ def get_user_counts(data_dir):
 
     # sorting users
     sorted_users = sorted(uname_counts.items(), key=operator.itemgetter(1))
-
-    unames, counts = zip(*sorted_users)
-    return unames, counts
+    return sorted_users
+    #
+    # unames, counts = zip(*sorted_users)
+    # return unames, counts

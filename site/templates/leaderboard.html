@@ -1,6 +1,14 @@
 {% extends "layout.html" %}
+
+
+{% block head %}
+<script src="http://www.google.com/jsapi"></script>
+<script src="ck/static/chartkick.js"></script>
+{% endblock %}
+
 {% block body %}
   <h2>Butterflies cropping leaderboard</h2>
   <br/>
-  <img src="leaderboard_im.png">
+  {% bar_chart user_counts %}
+
 {% endblock %}

@@ -2,6 +2,9 @@
 {% block body %}
   <form action="" method=post class="form-horizontal">
     <h2>Sign in to butterflies cropping </h2>
+    {% if error %}
+      <p class=error style="color:red"><strong>Error:</strong> {{ error }}
+    {% endif %}
     <div class="control-group">
         <p class="textboxlabel">Username:</p>
         <div class="controls">

@@ -2,6 +2,11 @@ import bcrypt
 import yaml
 import os
 from datetime import datetime
+import glob
+
+def is_ascii(s):
+    return all(ord(c) < 128 for c in s)
+
 
 class User():
 
@@ -10,6 +15,14 @@ class User():
 
     @classmethod
     def new_user(cls, username, password, email):
+        # check if user exists
+        usrs = glob.iglob('../users/*.yaml')
+        for xx in usrs:
+            print str(xx[9:-5])
+            if str(xx[9:-5]) == str(username):
+                print "Username exists"
+                return None
+
         usr = cls()
         usr.username = username
         usr.id = username
