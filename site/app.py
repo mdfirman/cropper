@@ -1,21 +1,14 @@
 # We need to import request to access the details of the POST request
 # and render_template, to render our templates (form and response)
 # we'll use url_for to get some URLs for the app on the templates
-from flask import Flask, render_template, request, url_for, send_from_directory
 import yaml
 import os
 import glob
 import time
 
-
-# Initialize the Flask application
-app = Flask(__name__)
-
 from flask_sqlalchemy import SQLAlchemy
-from flask import flash, redirect
 
-
-from flask import Flask,session, request, flash, url_for, redirect, render_template, abort ,g, Blueprint
+from flask import Flask,session, request, flash, url_for, redirect, render_template, abort ,g, Blueprint, send_from_directory, make_response
 from flask.ext.login import login_user , logout_user , current_user , login_required
 from flask.ext.login import LoginManager
 
@@ -26,12 +19,15 @@ import chartkick
 import random
 import StringIO
 
-from flask import make_response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+
+# Initialize the Flask application and login manager
+app = Flask(__name__)
+app.config.from_object("config")
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -101,7 +97,8 @@ def form():
 @app.route('/leaderboard')
 def leaderboard():
     user_counts = get_user_counts(data_dir)
-    user_counts.append(('hello', 5))
+    user_counts.append(('Lisa', 50))
+    user_counts.append(('Mark', 23))
     user_counts = [[str(xx), float(yy)] for xx, yy in user_counts][::-1]
     return render_template('leaderboard.html', user_counts=user_counts)
 
@@ -169,12 +166,15 @@ def register():
     if request.method == 'GET':
         return render_template('register.html')
 
-    user = User.new_user(request.form['username'] , request.form['password'],request.form['email'])
+    if request.form['passwordcheck'] != request.form['password']:
+        return render_template('register.html', error = "Error - passwords did not match")
+
+    user = User.new_user(request.form['username'] , request.formindex['password'],request.form['email'])
 
     # todo - check if user exists
     if user:
         user.dump()
-        return render_template('login.html')
+        return redirect(url_for('login'))
     else:
         return render_template('register.html', error = "Error - user already exists")
 
@@ -188,11 +188,16 @@ def load_user(username, password):
     else:
         return None
 
+
 @app.route('/index')
 @login_required
 def index():
-    print "Username", g.user.username
     return render_template('index.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 
 @app.route('/logout')

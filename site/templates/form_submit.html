@@ -4,20 +4,12 @@
 <link  href="{{ url_for('static', filename='cropper.min.css') }}" rel="stylesheet">
 <script src="{{ url_for('static', filename='cropper.min.js') }}" type="text/javascript"></script>
 <style>
-  /*#popup1 {
-    -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.3);
-    box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.3);
-  }*/
-  /*p {margin-bottom:0pt;}*/
-  /*#container{
-    margin-left: 10pt;
-    margin-top: 10pt;
-    width: 600px;
+  .formgroup {
+    margin-top: 20px;
   }
-  .imageholder{
-    position: absolute;
-  }*/
-
+  .textboxlabel {
+    margin-bottom: 5px;
+  }
 </style>
 <script type="text/javascript" language="javascript">
   function wings_checked()
@@ -49,26 +41,23 @@
     // here we want to check if we aren't allowed to crop, and if so disable all elements
     if (bad_image())
     {
-      document.getElementById("hiddensubmitter").style.display = "inline";
-      $(".wing-side").attr("class", "btn btn-primary wing-side disabled");
       $(".container > img").cropper("clear");
-      $(".container > img").cropper("disable");
+      $(".img-container > img").cropper("clear");
+      $(".img-container > img").cropper("disable");
       $(".popup").show();
-      // $(".imageholder").attr("opacity", 0.4)
-      $(".container > img").attr("opacity", 0.4);
-      $(".container > img").attr("background-color", "#000");
+      $(".onlyone").css("visibility", "hidden");
+      // $("#hiddensubmitter").css("visibility", "visible");
     }
     else {
-      document.getElementById("hiddensubmitter").style.display = "none";
-      $(".wing-side").attr("class", "btn btn-primary wing-side");
-      $(".container > img").cropper("enable");
+      // $("#hiddensubmitter").css("visibility", "hidden");
+      $(".img-container > img").cropper("enable");
       $(".popup").hide();
+      $(".onlyone").css("visibility", "visible");
     }
 
     var f = document.forms["main_form"].elements;
     var cansubmit = (wings_checked() && cropped()) || bad_image();
     document.getElementById('submitter').disabled = !cansubmit;
-    document.getElementById('hiddensubmitter').disabled = !cansubmit;
   }
 
   document.addEventListener('keydown', function(event) {
@@ -92,52 +81,61 @@
 
   <div id="content">
     <form id="main_form" method="post" action="{{ url_for('form_submission') }}">
-      <p>How many butterflies are in the image below?</p>
-      <span class="btn-group" id="howmany" data-toggle="buttons">
-        <label class="btn btn-primary">
-            <input type="radio" name="number_butterflies" id="zero_butterflies"
-              value="Zero" onchange="checkform()" >Zero
-        </label>
-        <label class="btn btn-primary active">
-          <input type="radio" name="number_butterflies" checked=""
-              value="One" id="one_butterfly" onchange="checkform()" >One
-        </label>
-        <label class="btn btn-primary" onchange="checkform()" >
-          <input type="radio" name="number_butterflies"  value="Many">Many
-        </label>
-      </span>
-      <span style="margin-left: 10px;" id="hiddensubmitter">
-        <label class="btn">
-          <input type="submit" id="hiddensubmitterbutton" class="btn btn-primary"/>
-        </label>
-      </span>
 
-      <p>Can you see the top of the wings, the bottom or both?</p>
-      <div class="btn-group"  data-toggle="buttons">
-        <label class="btn btn-primary wing-side">
-          <input type="radio" name="topbottom" value="Top" onchange="checkform()">Top
-        </label>
-        <label class="btn btn-primary wing-side">
-          <input type="radio" name="topbottom" onchange="checkform()" value="Bottom">Bottom
-        </label>
-        <label class="btn btn-primary wing-side">
-          <input type="radio" name="topbottom" onchange="checkform()" value="Both">Both
-        </label>
+      <div class="formgroup">
+        <p class="textboxlabel">How many butterflies are in the image below?</p>
+        <span class="btn-group" id="howmany" data-toggle="buttons">
+          <label class="btn btn-default">
+              <input type="radio" name="number_butterflies" id="zero_butterflies"
+                value="Zero" onchange="checkform()" >Zero
+          </label>
+          <label class="btn btn-default active">
+            <input type="radio" name="number_butterflies" checked=""
+                value="One" id="one_butterfly" onchange="checkform()" >One
+          </label>
+          <label class="btn btn-default" onchange="checkform()" >
+            <input type="radio" name="number_butterflies"  value="Many">Many
+          </label>
+        </span>
+        <span style="margin-left: 30px;">
+          <!-- <label class="btn btn-primary"> -->
+            <button type="submit" id="submitter" class="btn btn-primary">Submit</button>
+          <!-- </label> -->
+        </span>
       </div>
 
-      <p>Draw a box around the butterfly:</p>
+      <div class="onlyone formgroup">
+        <p  class="textboxlabel">Can you see the top of the wings, the bottom or both?</p>
+        <div class="btn-group"  data-toggle="buttons">
+          <label class="btn btn-default wing-side">
+            <input type="radio" name="topbottom" value="Top" onchange="checkform()">Top
+          </label>
+          <label class="btn btn-default wing-side">
+            <input type="radio" name="topbottom" onchange="checkform()" value="Bottom">Bottom
+          </label>
+          <label class="btn btn-default wing-side">
+            <input type="radio" name="topbottom" onchange="checkform()" value="Both">Both
+          </label>
+        </div>
+      </div>
 
-      <div class="container" id="imageholder" style="color:#0000FF">
-        <div id="horizontal"></div>
-        <div id="vertical"></div>
-        <img width="50%" src="{{ url_for('download_image', sighting_id=sighting_id, img_id=img_id) }}">
+      <div class="formgroup">
+        <p class="onlyone textboxlabel">Draw a box around the butterfly:</p>
+        <div class="img-container" id="imageholder" style="color:#0000FF">
+          <div id="horizontal"></div>
+          <div id="vertical"></div>
+          <img width="100%" src="{{ url_for('download_image', sighting_id=sighting_id, img_id=img_id) }}">
+        </div>
       </div>
 
       <script>
-      $('.container > img').cropper({
+      $('.img-container > img').cropper({
         //aspectRatio: 16 / 9,
         autoCrop: false,
         viewMode: 1,
+        background: false,
+        modal: true,
+        guides: false,
         crop: function(e) {
           // Output the result data for cropping image.
           document.getElementById("x").value = e.x;
@@ -151,28 +149,22 @@
       });
       </script>
 
-      <div>
+      <div class="formgroup">
         <input type="text" name="x" id="x" hidden />
         <input type="text" name="y" id="y" hidden />
         <input type="text" name="width" id="width" hidden />
         <input type="text" name="height" id="height" hidden />
         <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} hidden />
         <input type="text" name="img_id" id="img_id" value={{ img_id }} hidden />
-        <br/>
-        Enter notes here (e.g. 'blurry', 'very small', or 'broken wings'):
-        <br/>
-        <input type="text" name="notes" size="100" id="notes" class="form-control" />
+        <p  class="onlyone textboxlabel">Enter notes here (e.g. 'blurry', 'very small', or 'broken wings'):</p>
+        <input type="text" name="notes" size="100" id="notes" class="form-control onlyone" />
       </div>
 
-      <input type="submit" id="submitter" class="btn btn-primary" disabled/>
+      <hr/>
 
-      <br/>
-      Sighting ID: {{ sighting_id }}
-      <br/>
-      Image ID: {{ img_id }}
-      <br/>
-      <br/>
-      <emph>Shortcuts: No butterfly: 'z'</emph>
+      <p>Sighting ID: {{ sighting_id }}</p>
+      <p>Image ID: {{ img_id }}</p>
+      <p><emph>Shortcuts: No butterfly: 'z'</emph></p>
 
     </form>
   </div>

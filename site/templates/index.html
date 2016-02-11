@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1> Welcome</h1>
+<h1> Welcome {{ g.user.username }}</h1>
 <p>Welcome {{ g.user.username }} to butterfly cropping.</p>
 <p><a href="/cropper">Click here</a> to get started</p>
 
