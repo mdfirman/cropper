@@ -1,6 +1,3 @@
-# We need to import request to access the details of the POST request
-# and render_template, to render our templates (form and response)
-# we'll use url_for to get some URLs for the app on the templates
 import yaml
 import os
 import glob
@@ -16,13 +13,6 @@ from butterfly_file_handlers import build_unlabelled_img_set, get_user_counts
 from userclass import User
 
 import chartkick
-import random
-import StringIO
-
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 
 
 # Initialize the Flask application and login manager
@@ -30,8 +20,6 @@ app = Flask(__name__)
 app.config.from_object("config")
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-db = SQLAlchemy(app)
 
 global tic
 tic = time.time()
@@ -82,14 +70,10 @@ def get_new_images():
 @app.route('/cropper')
 @login_required
 def form():
-    """
-    This is run the first time the page is loaded
-    """
-    global tic, unlabelled_imgs
+    '''This is run the first time the page is loaded'''
+    global tic
     tic = time.time()
-    T = get_new_images()
-    print "T is ", T
-    new_sighting_id, new_img_id, new_img_name = T
+    new_sighting_id, new_img_id, new_img_name = get_new_images()
     return render_template('form_submit.html', sighting_id=new_sighting_id,
         img_id=new_img_name)
 
@@ -102,18 +86,13 @@ def leaderboard():
     user_counts = [[str(xx), float(yy)] for xx, yy in user_counts][::-1]
     return render_template('leaderboard.html', user_counts=user_counts)
 
-# Define a route for the action of the form, for example '/hello/'
-# We are also defining which type of requests this route is
-# accepting: POST requests in this case
+
 @app.route('/cropper', methods=['POST'])
 @login_required
 def form_submission():
-    """
-    This is run when the user clicks 'submit'
-    """
+    '''This is run when the user clicks 'submit', with a POST request'''
     global tic
 
-    # print "Getting form", request.form['option1']
     # get the results from the form
     results = {
         'number_butterflies': str(request.form['number_butterflies']),
@@ -138,13 +117,11 @@ def form_submission():
     img_id = request.form['img_id']
     savepath = data_dir + sighting_id + '/' + img_id.split('.')[0] + '_crop.yaml'
 
-    print "Saving results to ", savepath
     with open(savepath, 'w') as f:
         yaml.dump(results, f)
 
     # get a new image from the set of unlabelled images
     new_sighting_id, new_img_id, new_img_name = get_new_images()
-    print "Loading : ", new_sighting_id, new_img_id
 
     if new_sighting_id is None:
         return render_template('form_finished.html')

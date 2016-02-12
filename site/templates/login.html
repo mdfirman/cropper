@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
   <form action="" method=post class="form-horizontal">
-    <h2>Sign in to butterflies cropping </h2>
+    <h2>Log in to butterflies cropping </h2>
     {% if error %}
       <p class=error style="color:red"><strong>Error:</strong> {{ error }}
     {% endif %}
     <div class="control-group">
-        <p class="textboxlabel">Username:</p>
+        <p class="textboxlabel">Username</p>
         <div class="controls">
           <input type="text" id="username" name="username" class="form-control"
             placeholder="Enter Username" style="width: 200px;"  required>
@@ -14,7 +14,7 @@
     </div>
 
     <div class="control-group">
-        <p class="textboxlabel">Password:</p>
+        <p class="textboxlabel">Password</p>
         <div class="controls">
           <input type="password" id="password" name="password" class="form-control"
             placeholder="Enter Password" style="width: 200px;" required>
@@ -23,7 +23,7 @@
 
     <div class="control-group">
         <div class="controls">
-          <button type="submit" class="btn btn-success">Signin</button>
+          <button type="submit" class="btn btn-success">Log in</button>
         </div>
     </div>
   </form>

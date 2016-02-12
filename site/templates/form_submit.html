@@ -10,6 +10,9 @@
   .textboxlabel {
     margin-bottom: 5px;
   }
+  p {
+    font-size: 12pt;
+  }
 </style>
 <script type="text/javascript" language="javascript">
   function wings_checked()
@@ -120,7 +123,7 @@
       </div>
 
       <div class="formgroup">
-        <p class="onlyone textboxlabel">Draw a box around the butterfly:</p>
+        <p class="onlyone textboxlabel">Please draw a box tightly cropping the butterfly's wings:</p>
         <div class="img-container" id="imageholder" style="color:#0000FF">
           <div id="horizontal"></div>
           <div id="vertical"></div>
@@ -156,7 +159,9 @@
         <input type="text" name="height" id="height" hidden />
         <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} hidden />
         <input type="text" name="img_id" id="img_id" value={{ img_id }} hidden />
-        <p  class="onlyone textboxlabel">Enter notes here (e.g. 'blurry', 'very small', or 'broken wings'):</p>
+        <p  class="onlyone textboxlabel">Enter notes here
+          <span class="grey">&mdash; e.g. 'blurry', 'very small', or 'broken wings'</span>
+        </p>
         <input type="text" name="notes" size="100" id="notes" class="form-control onlyone" />
       </div>
 

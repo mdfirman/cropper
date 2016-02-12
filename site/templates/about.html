@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1> About butterfly cropping</h1>
+<h2> About butterfly cropping</h2>
 
 <p>
   At UCL we are working on automatic tools which can be useful for ecologists.
@@ -28,6 +28,16 @@
 <p>
   The cropped butterflies collected through this app will be vital to train and verify such an automatic system.
 </p>
+
+<h3>Technical bits</h3>
+<ul>
+  <li>The back-end is written in Python, using <a href="http://flask.pocoo.org/">Flask</a></li>
+  <li>The <a href="/leaderboard">leaderboard</a> is created using <a href="http://chartkick.com/">Chartkick</a></li>
+  <li>The css uses the standard <a href="http://getbootstrap.com/">Boostrap</a> theme</li>
+  <li>We use <a href="http://jinja.pocoo.org/">Jinja</a> for templating the pages</li>
+  <li>The cropping interface uses <a href="http://fengyuanchen.github.io/cropperjs/">cropper.js</a></li>
+</ul>
+
 
 <h3>Contact us</h3>
 <p>
