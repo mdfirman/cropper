@@ -31,6 +31,7 @@ ck = Blueprint('ck_page', __name__, static_folder=chartkick.js(), static_url_pat
 app.register_blueprint(ck, url_prefix='/ck')
 app.jinja_env.add_extension("chartkick.ext.charts")
 
+num_labellers_required_per_image = 3
 
 if debug:
     data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
@@ -43,16 +44,11 @@ global unlabelled_imgs
 unlabelled_imgs = build_unlabelled_img_set(data_dir, yaml_name)
 
 
-# this gets a specific image file, and is used in the form_submit.html
-@app.route('/<sighting_id>/<img_id>')
-def download_image(sighting_id, img_id):
-    print sighting_id, img_id
-    print "In app", data_dir + sighting_id, img_id
-    return send_from_directory(data_dir + sighting_id, img_id,
-        as_attachment=True)
 
-
-def get_new_images():
+def get_new_images(username):
+    '''
+    Returns a tuple with info about an image suitable for this user to label
+    '''
     global unlabelled_imgs
 
     if not unlabelled_imgs:
@@ -63,7 +59,39 @@ def get_new_images():
         if not unlabelled_imgs:
             return None, None, None
 
-    return unlabelled_imgs.pop()
+    # iterate until we have found one that this user hasn't labelled
+    for (sighting_id, img_id), tmp in unlabelled_imgs.iteritems():
+        if username not in tmp['labellers']:
+            return sighting_id, img_id, tmp['img_name']
+
+    # should only get here if this user has labelled all the images which
+    # haven't been labelled enough
+    return None, None, None
+
+
+def remember_user_labelling(sighting_id, img_id, username):
+    '''
+    Adds the fact that a user has done a labelling to the main dictionary
+    Will remove the image if it get above a threshold
+    '''
+    global unlabelled_imgs
+
+    unlabelled_imgs[(sighting_id, img_id)]['labellers'].add(username)
+
+    num_labellers = len(unlabelled_imgs[(sighting_id, img_id)]['labellers'])
+
+    if num_labellers >= num_labellers_required_per_image:
+        print "Removing image %s, %s" % (sighting_id, img_id)
+        del unlabelled_imgs[(sighting_id, img_id)]
+
+
+# this gets a specific image file, and is used in the form_submit.html
+@app.route('/<sighting_id>/<img_id>')
+def download_image(sighting_id, img_id):
+    print sighting_id, img_id
+    print "In app", data_dir + sighting_id, img_id
+    return send_from_directory(data_dir + sighting_id, img_id,
+        as_attachment=True)
 
 
 # Define a route for the default URL, which loads the form
@@ -73,9 +101,16 @@ def form():
     '''This is run the first time the page is loaded'''
     global tic
     tic = time.time()
-    new_sighting_id, new_img_id, new_img_name = get_new_images()
-    return render_template('form_submit.html', sighting_id=new_sighting_id,
-        img_id=new_img_name)
+    new_sighting_id, new_img_id, new_img_name = get_new_images(g.user.username)
+
+    if new_sighting_id is None:
+        return render_template('form_finished.html')
+    else:
+        # start the clock and render the new page
+        tic = time.time()
+        print new_img_name
+        return render_template('form_submit.html', sighting_id=new_sighting_id,
+            img_id=new_img_name)
 
 
 @app.route('/leaderboard')
@@ -115,13 +150,18 @@ def form_submission():
     # save the results to disk
     sighting_id = request.form['sighting_id']
     img_id = request.form['img_id']
-    savepath = data_dir + sighting_id + '/' + img_id.split('.')[0] + '_crop.yaml'
+    savepath = data_dir + sighting_id + '/' + \
+        img_id.split('.')[0] + '_' + g.user.username + '_crop.yaml'
+
+    remember_user_labelling(sighting_id, img_id.split('.')[0], g.user.username)
 
     with open(savepath, 'w') as f:
         yaml.dump(results, f)
 
     # get a new image from the set of unlabelled images
-    new_sighting_id, new_img_id, new_img_name = get_new_images()
+    new_tic = time.time()
+    new_sighting_id, new_img_id, new_img_name = get_new_images(g.user.username)
+    print "Took %fs to get new images" % (time.time() - new_tic)
 
     if new_sighting_id is None:
         return render_template('form_finished.html')
@@ -146,7 +186,7 @@ def register():
     if request.form['passwordcheck'] != request.form['password']:
         return render_template('register.html', error = "Error - passwords did not match")
 
-    user = User.new_user(request.form['username'] , request.formindex['password'],request.form['email'])
+    user = User.new_user(request.form['username'] , request.form['password'],request.form['email'])
 
     # todo - check if user exists
     if user:
@@ -166,7 +206,7 @@ def load_user(username, password):
         return None
 
 
-@app.route('/index')
+@app.route('/')
 @login_required
 def index():
     return render_template('index.html')
@@ -196,7 +236,7 @@ def login():
 
     login_user(registered_user)
     flash('Logged in successfully')
-    return redirect(request.args.get('next') or url_for('index'))
+    return redirect('/')
 
 
 @app.before_request

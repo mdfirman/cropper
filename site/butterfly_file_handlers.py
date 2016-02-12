@@ -2,7 +2,10 @@ import yaml
 import os
 import operator
 import glob
+import time
 import collections
+
+num_labellers_required_per_image = 3
 
 
 def extract_latin_name(name):
@@ -17,9 +20,17 @@ def build_unlabelled_img_set(data_dir, yaml_name):
     Returns set of unlabelled images, consisting of tuples of
     (sightingID, imageID)
     '''
+    tic = time.time()
     unlabelled_imgs = set()
 
-    # yaml_paths = glob.glob(data_dir + '*/*meta.yaml')
+    # keys are (sighting_id, img_id) tuples
+    # values are a dict containing:
+        # image name
+        # a list of who has labelled which images
+    # ultimately make this an ordered dict we can pop items off...
+    who_labelled_what = collections.OrderedDict()
+
+    # find names of all the images in the collection
     sighting_ids = yaml.load(
         open(data_dir + '../' + yaml_name), Loader=yaml.CLoader)
 
@@ -29,26 +40,51 @@ def build_unlabelled_img_set(data_dir, yaml_name):
         if ' ' in img_id:
             continue
 
-        meta = yaml.load(open(data_dir + sighting_id + '/meta.yaml'),
-            Loader=yaml.CLoader)
+        who_labelled_what[(sighting_id, img_id)] = {
+            'img_name': img_name, 'labellers': set()}
 
-        likely_id = extract_latin_name(meta['meta_tags']['likely_id'])
+    # finding the croppings which have been already performed
+    start = len(data_dir)
+    crop_paths = glob.glob(data_dir + '*/*_crop.yaml')
 
-        # if likely_id != "pieris brassicae":
-        #     continue
+    for crop_path in crop_paths:
+        sighting_id, tmp = crop_path[start:].split('/')
+        img_id, user, _ = tmp.split('_')
+        who_labelled_what[(sighting_id, img_id)]['labellers'].add(user)
 
-        crop_path = data_dir + sighting_id + '/' + img_id + '_crop.yaml'
+    # sort the dictionary by how many times each item has been labelled
+    who_labelled_what = collections.OrderedDict(sorted(
+        who_labelled_what.items(),
+        key=lambda x: len(x[1]['labellers']), reverse=True))
 
-        # could run glob.glob on data_dir just once to speed this up
-        if not os.path.exists(crop_path):
-            unlabelled_imgs.add((sighting_id, img_id, img_name))
-        else:
-            pass
+    # remove items from the dict which have been done enough times
+    who_labelled_what = collections.OrderedDict(
+        (xx, yy) for xx, yy in who_labelled_what.items()
+        if len(yy['labellers']) < num_labellers_required_per_image
+    )
 
-    if len(unlabelled_imgs) == 0:
+    # this orderddict is now the main dictionary.
+    # when a user makes a request for a new item to label, we iterate through
+    # the dictionary from least to most labelled until we find an item they
+    # haven't labelled
+
+    # when the set of users who have labelled each item gets big enough, we
+    # remove it from the list
+
+    # this will be slower now for users who have labelled many items, but
+    # in a typical use case I imagine most users will have labelled < 500
+    # so shouldn't be too bad
+
+    # todo - after user submits, we need to add their name to the set and remove if needed
+
+    print yaml.dump(who_labelled_what)
+
+    if len(who_labelled_what) == 0:
         print "No unlabelled images!"
 
-    return unlabelled_imgs
+    print "Took %fs to build unlabelled image set" % (time.time() - tic)
+
+    return who_labelled_what
 
 
 def get_user_counts(data_dir):
@@ -56,16 +92,19 @@ def get_user_counts(data_dir):
     returns a list of users and an equivalent list of their counts,
     sorted so the most prolific users are last in the list
     '''
+    tic = time.time()
     uname_counts = collections.defaultdict(int)
 
     fnames = glob.glob(data_dir + '/*/*_crop.yaml')
+    start = len(data_dir)
     for fname in fnames:
-        crop = yaml.load(open(fname))
-        if 'username' in crop:
-            uname_counts[crop['username']] += 1
+        username = fname[start:].split('_')[1]
+        uname_counts[username] += 1
 
     # sorting users
     sorted_users = sorted(uname_counts.items(), key=operator.itemgetter(1))
+
+    print "Getting user counts took %fs" % (time.time() - tic)
     return sorted_users
     #
     # unames, counts = zip(*sorted_users)
