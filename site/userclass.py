@@ -3,6 +3,7 @@ import yaml
 import os
 from datetime import datetime
 
+users_folder = '../data/users/'
 
 class User():
 
@@ -12,7 +13,7 @@ class User():
     @classmethod
     def new_user(cls, username, password, email):
         # check if user exists
-        usernamepath = 'data/users/' + username + '.yaml'
+        usernamepath = users_folder + username.lower() + '.yaml'
         if os.path.exists(usernamepath):
             print "Username exists"
             return None
@@ -37,8 +38,7 @@ class User():
 
     @classmethod
     def from_id(cls, id):
-        foldername = 'data/users/'
-        fname = foldername + id + '.yaml'
+        fname = users_folder + id.lower() + '.yaml'
         print "Loading"
         # check user exists in our 'database'
         if os.path.exists(fname):
@@ -62,8 +62,8 @@ class User():
     def __repr__(self):
         return '<User %r, pw: %s>' % (self.username, self.hashed_password)
 
-    def dump(self, foldername='data/users/'):
-        fname = foldername + self.username + '.yaml'
+    def dump(self):
+        fname = users_folder + self.username.lower() + '.yaml'
         yaml.dump(self.__dict__, open(fname, 'w'))
 
     def pw_correct(self, pw_guess):

@@ -4,12 +4,52 @@
 {% if g.user.is_authenticated%}
   <h2> Welcome {{ g.user.username }}</h2>
   <p>Welcome {{ g.user.username }} to butterfly cropping.</p>
-  <p><a href="/cropper">Click here</a> to get started</p>
-  <p><a href="{{ url_for('logout') }}"> Logout</a> </p>
 {% else %}
   <h2>Welcome to butterfly cropping</h2>
-  <p>Thanks for taking part in this beta test of the butterflies cropping site.</p>
-  <p>Use the menu above to look at the leaderboard and to read about the project.</p>
+{% endif %}
+
+<div style="color: #2222bb;">
+  <p>
+    This is the beta version of the site, with only thirty sample images to crop. Please let me (Michael) know about:
+  </p>
+  <ul>
+    <li>Any bugs or errors you find</li>
+    <li>Any suggestions for making the site easier to use</li>
+    <li>Anything else you are thinking</li>
+  </ul>
+  <p>I'm particularly interested to know if this works on internet explorer as I haven't tried that yet...</p>
+  <p>Thanks a lot!</p>
+</div>
+<hr/>
+
+<p>
+  By taking part in this project, you can help us transform images containing a butterfly into an image of just a butterfly:
+</p>
+<div>
+  <div style="display: inline-block; width: 40%; padding: 10px;">
+    <img src="../static/before_crop.jpg" width="100%" />
+    <p style="text-align: center;">Before cropping</p>
+  </div>
+  <div style="display: inline-block;  width: 12%; left: 0%;  padding: 10px; position: relative; top: -100px;">
+    <img src="../static/arrow.png" width="100%" />
+  </div>
+  <div style="display: inline-block;  width: 40%;  padding: 10px; position: relative; top: -30px;">
+    <img src="../static/after_crop.jpg" width="100%" />
+    <p style="text-align: center;">After cropping</p>
+  </div>
+</div>
+<p>
+  These cropped images are important data for tools we are building to help ecologists answer questions about biodiversity.
+</p>
+<hr/>
+<p>
+  Use the menu above to look at the leaderboard and to read more about the project.
+</p>
+
+{% if g.user.is_authenticated%}
+  <p>Then, <a href="/cropper">click here</a> to get started</p>
+{% else %}
   <p>Then, please <a href="{{ url_for('register') }}"> register</a> or <a href="{{ url_for('login') }}"> log in</a> to take part in the cropping effort.</p>
 {% endif %}
+
 {% endblock %}

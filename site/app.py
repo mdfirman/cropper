@@ -254,7 +254,7 @@ if __name__ == '__main__':
     import socket
     if socket.gethostname() == 'oisin':
         app.run(
-            debug=debug,
+            debug=False,
             host="0.0.0.0",
             port=int("80")
         )

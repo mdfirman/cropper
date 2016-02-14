@@ -91,8 +91,8 @@
 
         <button data-toggle="collapse" data-target="#demo" type="button" class="btn btn-default onlyone">Enter notes</button>
         <div id="demo" class="collapse" style='margin-top: 10px'>
-          <p class="onlyone textboxlabel">Enter notes here
-            <span class="grey">&mdash; e.g. 'blurry' or 'very small'.</br>Only bother with this in exceptional circumstances, e.g. one image in 50 or so.</span>
+          <p class="onlyone textboxlabel">
+            <span class="grey small">e.g. 'blurry' or 'very small'.</br>Only bother with this in exceptional circumstances, perhaps one image in every 50.</span>
           </p>
           <input type="text" name="notes" size="100" id="notes" class="form-control onlyone" />
         </div>
@@ -100,8 +100,8 @@
 
       <hr/>
 
-      <p class='grey'>Sighting ID: {{ sighting_id }}</p>
-      <p  class='grey'>Image ID: {{ img_id }}</p>
+      <p class='grey small'>Sighting ID: {{ sighting_id }}</p>
+      <p  class='grey small'>Image ID: {{ img_id }}</p>
 
     </form>
   </div>
@@ -205,7 +205,7 @@
               <p style="text-align: center;">(includes antennae)</p>
             </div>
           </div>
-          <p>You can adjust the crop box by dragging its edges.</p>
+          <p>You can adjust the crop box by dragging its edges, but don't bother making it too perfect. Around 5 seconds is a good length of time to spend drawing the box.</p>
           <p>Once you are happy, click 'Submit' to move on.</p>
         </div>
         <div class="modal-footer">

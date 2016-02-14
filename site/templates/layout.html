@@ -25,7 +25,7 @@
           <span class="icon-bar"></span>
         </button>
         <img class="navbar-brand" src="../static/bfly_logo.svg">
-        <a class="navbar-brand" href="/">UCL butterflies</a>
+        <a class="navbar-brand" href="/">Butterflies home</a>
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
@@ -46,11 +46,11 @@
             <li><a href="{{ url_for('logout') }}">Logout {{ g.user.username }}</a></li>
           {% endif %}
           {% if not g.user.is_authenticated%}
-            <li {% if request.path == '/login' %}class="active"{% endif %}>
-              <a href="{{ url_for('login') }}">Login</a>
-            </li>
             <li {% if request.path == '/register' %}class="active"{% endif %}>
               <a href="{{ url_for('register') }}">Register</a>
+            </li>
+            <li {% if request.path == '/login' %}class="active"{% endif %}>
+              <a href="{{ url_for('login') }}">Login</a>
             </li>
           {% endif %}
         </ul>
@@ -62,7 +62,7 @@
       {% block body %}{% endblock %}
       <hr>
       <footer id="footer">
-          <p style="color: grey; font-size: 10pt;">Butterflies cropping app built by <a href="http://www.michaelfirman.co.uk">Michael Firman</a> using lots of help from the internet</p>
+          <p class="small grey">Butterflies cropping app built by <a href="http://www.michaelfirman.co.uk">Michael Firman</a> using lots of help from the internet</p>
       </footer>
   </div>
 </body>

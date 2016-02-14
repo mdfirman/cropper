@@ -1,1 +1,1 @@
-rsync -a . admin@oisin:~/butterflies/
+rsync -a . admin@oisin:~/butterflies/site/

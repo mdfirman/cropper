@@ -7,7 +7,7 @@
     {% endif %}
     <div class="control-group">
       <p class="textboxlabel">Choose a username
-        <span class="grey">&mdash; this will be displayed in the public leaderboard. Please use letters and digits only.</span>
+        <span class="grey small"></br>This will be displayed in the public leaderboard. Please use letters and digits only.</span>
       </p>
       <div class="controls">
         <input type="text" id="username" name="username" class="form-control"
@@ -17,7 +17,9 @@
     </div>
 
     <div class="control-group">
-      <p class="textboxlabel">Choose a password
+      <p class="textboxlabel">
+        Choose a password
+        <span class="grey small"></br>This is salted and hashed. Nonetheless please don't use your email or bank password here</span>
       </p>
       <div class="controls">
         <input type="password" id="password" name="password" class="form-control"
@@ -38,7 +40,7 @@
     <div class="control-group">
       <div class="controls">
         <p class="textboxlabel">Please enter your email address
-          <span class="grey">&mdash; this will not be made public, and we won't spam you </span></p>
+          <span class="grey small"><br>This will not be made public, and we won't spam you</span></p>
         <input type="email" id="email" name="email" class="form-control"
           placeholder="Enter Email" style="width: 500px;" value="{{ request.form.email }}"
           required>
