@@ -22,9 +22,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "/login"
 
-global tic
-tic = time.time()
-
 
 # adding chartkick
 ck = Blueprint('ck_page', __name__, static_folder=chartkick.js(), static_url_path='/static')
@@ -96,15 +93,13 @@ def download_image(sighting_id, img_id):
 @login_required
 def form():
     '''This is run the first time the page is loaded'''
-    global tic
-    tic = time.time()
     new_sighting_id, new_img_id, new_img_name = get_new_images(g.user.username)
 
     if new_sighting_id is None:
         return render_template('form_finished.html')
     else:
         # start the clock and render the new page
-        tic = time.time()
+        session['tic'] = time.time()
         print new_img_name
         return render_template('form_submit.html', sighting_id=new_sighting_id,
             img_id=new_img_name)
@@ -122,12 +117,11 @@ def leaderboard():
 @login_required
 def form_submission():
     '''This is run when the user clicks 'submit', with a POST request'''
-    global tic
 
     # get the results from the form
     results = {
         'number_butterflies': str(request.form['number_butterflies']),
-        'time_taken': time.time() - tic,
+        'time_taken': time.time() - session['tic'],
         'username': g.user.username,
         'datetime': time.time()
     }
@@ -163,7 +157,7 @@ def form_submission():
         return render_template('form_finished.html')
     else:
         # start the clock and render the new page
-        tic = time.time()
+        session['tic'] = time.time()
         print new_img_name
         return render_template('form_submit.html', sighting_id=new_sighting_id,
             img_id=new_img_name)
@@ -195,7 +189,7 @@ def register():
 
     if user:
         user.dump()
-        return render_template('login.html', welcome='Thanks for registering! Now log in below to get started.')
+        return redirect(url_for('login', welcome=True))
     else:
         return render_template('register.html', error="User already exists")
 
@@ -228,17 +222,25 @@ def logout():
 
 @app.route('/login',methods=['GET','POST'])
 def login():
+    print "Login"
     if request.method == 'GET':
-        return render_template('login.html')
+        print "Get method"
+        return render_template('login.html', welcome=request.args.get('welcome'))
+
+    print "Post method"
     username = request.form['username']
+    print "Post method1"
     password = request.form['password']
+    print "Post method2"
     registered_user = load_user(username, password)
+    print "Post method3"
 
     if registered_user is None:
         return render_template('login.html', error = "Error - Username or Password is invalid")
+    print "Post method4"
 
     login_user(registered_user)
-    flash('Logged in successfully')
+    print 'Logged in successfully'
     return redirect('/')
 
 
