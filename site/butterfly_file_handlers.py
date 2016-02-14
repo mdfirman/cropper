@@ -123,8 +123,8 @@ def getpaths(debug):
 
     elif host == 'oisin':
         if debug:
-            data_dir = '~/butterflies/data/sightings_subset'
-            yaml_name = 'sightings_subset.yaml'
+            data_dir = '/home/admin/butterflies/data/sightings/'
+            yaml_name = 'butterflies_for_beta_website.yaml'
         else:
             raise Exception('Not ready for the real thing yet')
     else:

@@ -5,6 +5,9 @@
     {% if error %}
       <p class=error style="color:red"><strong>Error:</strong> {{ error }}
     {% endif %}
+    {% if welcome %}
+      <p class=error style="color:blue">{{ welcome }}
+    {% endif %}
     <div class="control-group">
         <p class="textboxlabel">Username</p>
         <div class="controls">

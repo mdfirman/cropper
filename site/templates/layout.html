@@ -7,34 +7,7 @@
 <link rel="shortcut icon" href="../static/favicon.ico" />
 <meta charset="utf-8">
 <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-body {
-  min-height: 200px;
-  padding-top: 70px;
-  padding-bottom: 100px;
-}
-.textboxlabel {
-  margin-bottom: 0px;
-}
-.control-group{
-  margin-top: 10px;
-}
-#main{
-  max-width: 600px;
-}
-h3 {
-  margin-top: 40px;
-}
-h2 {
-  margin-bottom: 20px;
-}
-.grey{
-  color: #AAAAAA;
-}
-p {
-  font-size: 12pt;
-}
-</style>
+<link href="../static/style.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
 {% block head %}{% endblock %}
@@ -80,9 +53,8 @@ p {
               <a href="{{ url_for('register') }}">Register</a>
             </li>
           {% endif %}
-          <!-- <li class="active"><a href="./">Fixed top <span class="sr-only">(current)</span></a></li> -->
         </ul>
-      </div><!--/.nav-collapse -->
+      </div>
     </div>
   </nav>
 

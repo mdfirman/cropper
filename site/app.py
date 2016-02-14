@@ -20,6 +20,7 @@ app = Flask(__name__)
 app.config.from_object("config")
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "/login"
 
 global tic
 tic = time.time()
@@ -195,7 +196,7 @@ def register():
 
     if user:
         user.dump()
-        return redirect(url_for('login'))
+        return render_template('login.html', welcome='Thanks for registering! Now log in below to get started.')
     else:
         return render_template('register.html', error="User already exists")
 
@@ -249,8 +250,12 @@ def before_request():
 
 if __name__ == '__main__':
     app.secret_key = "\x7f\x83\x91\xb6O\x0b\x7f\xf4\xf3\xddD\x1b\xb5\x00|\x16\x90\x83U(E\xfb\x8as"
-    app.run(
-        debug=debug,
-        host="0.0.0.0",
-        port=int("80")
-    )
+    import socket
+    if socket.gethostname() == 'oisin':
+        app.run(
+            debug=debug,
+            host="0.0.0.0",
+            port=int("80")
+        )
+    else:
+        app.run(debug=True)

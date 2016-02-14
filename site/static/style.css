@@ -1,0 +1,29 @@
+#main{
+  max-width: 600px;
+}
+body {
+  min-height: 200px;
+  padding-top: 70px;
+  padding-bottom: 100px;
+}
+p {
+  font-size: 12pt;
+}
+h3 {
+  margin-top: 40px;
+}
+h2 {
+  margin-bottom: 20px;
+}
+.control-group{
+  margin-top: 10px;
+}
+.grey{
+  color: #AAAAAA;
+}
+.formgroup {
+  margin-top: 20px;
+}
+.textboxlabel {
+  margin-bottom: 5px;
+}

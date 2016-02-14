@@ -2,10 +2,6 @@ import bcrypt
 import yaml
 import os
 from datetime import datetime
-import glob
-
-def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
 
 
 class User():
@@ -16,19 +12,17 @@ class User():
     @classmethod
     def new_user(cls, username, password, email):
         # check if user exists
-        usrs = glob.iglob('../users/*.yaml')
-        for xx in usrs:
-            print str(xx[9:-5])
-            if str(xx[9:-5]) == str(username):
-                print "Username exists"
-                return None
+        usernamepath = 'data/users/' + username + '.yaml'
+        if os.path.exists(usernamepath):
+            print "Username exists"
+            return None
 
         usr = cls()
         usr.username = username
         usr.id = username
         # hash password immediately
         usr.salt = bcrypt.gensalt()
-        usr.hashed_password = bcrypt.hashpw(password, usr.salt)
+        usr.hashed_password = bcrypt.hashpw(password.encode('utf-8'), usr.salt)
         usr.email = email
         usr.registered_on = datetime.utcnow()
         return usr
@@ -43,7 +37,7 @@ class User():
 
     @classmethod
     def from_id(cls, id):
-        foldername = '../users/'
+        foldername = 'data/users/'
         fname = foldername + id + '.yaml'
         print "Loading"
         # check user exists in our 'database'
@@ -68,12 +62,12 @@ class User():
     def __repr__(self):
         return '<User %r, pw: %s>' % (self.username, self.hashed_password)
 
-    def dump(self, foldername='../users/'):
+    def dump(self, foldername='data/users/'):
         fname = foldername + self.username + '.yaml'
         yaml.dump(self.__dict__, open(fname, 'w'))
 
     def pw_correct(self, pw_guess):
-        hashed_guess = bcrypt.hashpw(pw_guess, self.salt)
+        hashed_guess = bcrypt.hashpw(pw_guess.encode('utf-8'), self.salt)
         correct = self.hashed_password == hashed_guess
         print "Correct: ", correct
         return correct

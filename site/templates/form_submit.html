@@ -3,75 +3,10 @@
 <title>Butterfly cropping v0.1</title>
 <link  href="{{ url_for('static', filename='cropper.min.css') }}" rel="stylesheet">
 <script src="{{ url_for('static', filename='cropper.min.js') }}" type="text/javascript"></script>
-<style>
-  .formgroup {
-    margin-top: 20px;
-  }
-  .textboxlabel {
-    margin-bottom: 5px;
-  }
-  p {
-    font-size: 12pt;
-  }
-</style>
-<script type="text/javascript" language="javascript">
-  function wings_checked()
-  {
-    var chx = document.getElementsByName('topbottom');
-    for (var i=0; i<chx.length; i++) {
-    // If you have more than one radio group, also check the name attribute
-    // for the one you want as in && chx[i].name == 'choose'
-    // Return true from the function on first match of a checked item
-      if (chx[i].type == 'radio' && chx[i].checked) {
-        return true;
-      }
-    }
-  }
-
-  function bad_image()
-  {
-    return !(document.getElementById("one_butterfly").checked);
-  }
-
-  function cropped()
-  {
-    return document.getElementById("x").value != "";
-  }
-
-  // http://stackoverflow.com/questions/13931688/disable-enable-submit-button-until-all-forms-have-been-filled
-  function checkform()
-  {
-    // here we want to check if we aren't allowed to crop, and if so disable all elements
-    if (bad_image())
-    {
-      $(".container > img").cropper("clear");
-      $(".img-container > img").cropper("clear");
-      $(".img-container > img").cropper("disable");
-      $(".onlyone").css("visibility", "hidden");
-    }
-    else {
-      $(".img-container > img").cropper("enable");
-      $(".onlyone").css("visibility", "visible");
-    }
-
-    var f = document.forms["main_form"].elements;
-    var cansubmit = (wings_checked() && cropped()) || bad_image();
-    document.getElementById('submitter').disabled = !cansubmit;
-  }
-
-  document.addEventListener('keydown', function(event) {
-    console.log(event.keyCode)
-    if (event.keyCode == 90) { // 90 = 'z'
-        document.getElementById("zero_butterflies").checked = "checked";
-        checkform();
-        document.getElementById("main_form").submit();
-    }
-  }, true);
-</script>
+<script src="../static/crop_page.js" type="text/javascript" language="javascript"></script>
 {% endblock %}
 
 {% block body %}
-
 <div id="container">
   <div id="content">
     <form id="main_form" method="post" action="{{ url_for('form_submission') }}">
@@ -165,9 +100,8 @@
 
       <hr/>
 
-      <p>Sighting ID: {{ sighting_id }}</p>
-      <p>Image ID: {{ img_id }}</p>
-      <p><emph>Shortcuts: No butterfly: 'z'</emph></p>
+      <p class='grey'>Sighting ID: {{ sighting_id }}</p>
+      <p  class='grey'>Image ID: {{ img_id }}</p>
 
     </form>
   </div>
@@ -183,7 +117,7 @@
           <h4 class="modal-title">How many butterflies?</h4>
         </div>
         <div class="modal-body">
-          <p>Click on the number of butterflies you can see, after a second or two looking, in the image. Here are some examples: </p>
+          <p>Click on the number of butterflies you can see, after a second or two looking, in the image. Note that caterpillars, eggs or larvae count as 'Zero'. Here are some examples: </p>
           <div>
             <div style="float: left; width: 33%; padding: 10px;">
               <img src="../static/zero.jpg" width="100%" />
@@ -198,7 +132,6 @@
               <p style="text-align: center;">Many</p>
             </div>
           </div>
-          <p>Note that caterpillars, eggs or larvae count as 'Zero'.</p>
           <p>'Zero' or 'Many' butterflies means your work is done! Click submit to move on.</p>
           <p>Power users can use the 'z' key as a shortcut for 'Zero' + 'Submit'.</p>
         </div>
@@ -221,7 +154,7 @@
           <h4 class="modal-title">Top, bottom, or both?</h4>
         </div>
         <div class="modal-body">
-          <p>We'd like to know if you can see the top of the butterfly wings, the bottom, or both. See the examples below:.</p>
+          <p>We'd like to know if you can see the top of the butterfly wings, the bottom, or both. See the examples below:</p>
           <div>
             <div style="float: left; width: 33%; padding: 10px;">
               <img src="../static/top.jpg" width="100%" />
@@ -256,7 +189,24 @@
           <h4 class="modal-title">Drawing a cropping box</h4>
         </div>
         <div class="modal-body">
-          <p>Todo.</p>
+          <p>Please click and drag with the mouse to draw a box tightly cropping the butterfly's wings. Pretend the legs, body and antennae don't exist. Here are some good and bad examples:</p>
+          <div>
+            <div style="float: left; width: 33%; padding: 10px;">
+              <img src="../static/good1.png" width="100%" />
+              <p style="text-align: center;">Good cropping</p>
+            </div>
+            <div style="float: left; width: 33%; left: 0%;  padding: 10px;">
+              <img src="../static/good2.png" width="100%" />
+              <p style="text-align: center;">Good cropping</p>
+            </div>
+            <div style="float: left; width: 33%;  padding: 10px;">
+              <img src="../static/bad1.png" width="100%" />
+              <p style="text-align: center;">Bad cropping</p>
+              <p style="text-align: center;">(includes antennae)</p>
+            </div>
+          </div>
+          <p>You can adjust the crop box by dragging its edges.</p>
+          <p>Once you are happy, click 'Submit' to move on.</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
