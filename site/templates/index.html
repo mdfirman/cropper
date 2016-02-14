@@ -1,9 +1,15 @@
 {% extends "layout.html" %}
 {% block body %}
-<h2> Welcome {{ g.user.username }}</h2>
-<p>Welcome {{ g.user.username }} to butterfly cropping.</p>
-<p><a href="/cropper">Click here</a> to get started</p>
 
-<!-- This needs to be url_for to run the logout function !-->
-<p><a href="{{ url_for('logout') }}"> Logout</a> </p>
+{% if g.user.is_authenticated%}
+  <h2> Welcome {{ g.user.username }}</h2>
+  <p>Welcome {{ g.user.username }} to butterfly cropping.</p>
+  <p><a href="/cropper">Click here</a> to get started</p>
+  <p><a href="{{ url_for('logout') }}"> Logout</a> </p>
+{% else %}
+  <h2>Welcome to butterfly cropping</h2>
+  <p>Thanks for taking part in this beta test of the butterflies cropping site.</p>
+  <p>Use the menu above to look at the leaderboard and to read about the project.</p>
+  <p>Then, please <a href="{{ url_for('register') }}"> register</a> or <a href="{{ url_for('login') }}"> log in</a> to take part in the cropping effort.</p>
+{% endif %}
 {% endblock %}

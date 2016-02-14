@@ -1,15 +1,15 @@
 import yaml
+import string
 import os
 import glob
 import time
-
-from flask_sqlalchemy import SQLAlchemy
+import socket
 
 from flask import Flask,session, request, flash, url_for, redirect, render_template, abort ,g, Blueprint, send_from_directory, make_response
 from flask.ext.login import login_user , logout_user , current_user , login_required
 from flask.ext.login import LoginManager
 
-from butterfly_file_handlers import build_unlabelled_img_set, get_user_counts
+from butterfly_file_handlers import build_unlabelled_img_set, get_user_counts, getpaths
 from userclass import User
 
 import chartkick
@@ -24,25 +24,20 @@ login_manager.init_app(app)
 global tic
 tic = time.time()
 
-debug = True
 
 # adding chartkick
 ck = Blueprint('ck_page', __name__, static_folder=chartkick.js(), static_url_path='/static')
 app.register_blueprint(ck, url_prefix='/ck')
 app.jinja_env.add_extension("chartkick.ext.charts")
 
+# setting some constants
+debug = True
 num_labellers_required_per_image = 3
+data_dir, yaml_name = getpaths(debug)
 
-if debug:
-    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
-    yaml_name = 'sightings_subset.yaml'
-else:
-    data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/butterfly_subset/'
-    yaml_name = 'butterflies.yaml'
-
+# creating the list of unlabelled images
 global unlabelled_imgs
 unlabelled_imgs = build_unlabelled_img_set(data_dir, yaml_name)
-
 
 
 def get_new_images(username):
@@ -53,6 +48,7 @@ def get_new_images(username):
 
     if not unlabelled_imgs:
         # might have run out, or might have missed one. Check all the files...
+        print "Checking again..."
         unlabelled_imgs = build_unlabelled_img_set(data_dir, yaml_name)
 
         # now check again, if still empty then we're done
@@ -184,16 +180,24 @@ def register():
         return render_template('register.html')
 
     if request.form['passwordcheck'] != request.form['password']:
-        return render_template('register.html', error = "Error - passwords did not match")
+        return render_template('register.html', error="Passwords did not match")
 
-    user = User.new_user(request.form['username'] , request.form['password'],request.form['email'])
+    extra_letters = set(request.form['username']) - set(
+        string.ascii_lowercase + string.ascii_uppercase + string.digits)
 
-    # todo - check if user exists
+    if extra_letters:
+        return render_template(
+            'register.html', error="Please make sure username"
+            " contains letters and digits only, no funny business.")
+
+    user = User.new_user(request.form['username'],
+        request.form['password'], request.form['email'])
+
     if user:
         user.dump()
         return redirect(url_for('login'))
     else:
-        return render_template('register.html', error = "Error - user already exists")
+        return render_template('register.html', error="User already exists")
 
 
 def load_user(username, password):
@@ -207,7 +211,6 @@ def load_user(username, password):
 
 
 @app.route('/')
-@login_required
 def index():
     return render_template('index.html')
 
@@ -243,11 +246,11 @@ def login():
 def before_request():
     g.user = current_user
 
-# Run the app :)
+
 if __name__ == '__main__':
-    app.secret_key = 'super secret key'
+    app.secret_key = "\x7f\x83\x91\xb6O\x0b\x7f\xf4\xf3\xddD\x1b\xb5\x00|\x16\x90\x83U(E\xfb\x8as"
     app.run(
-        debug=True
-        # host="0.0.0.0",
-        # port=int("80")
+        debug=debug,
+        host="0.0.0.0",
+        port=int("80")
     )

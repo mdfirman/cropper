@@ -4,6 +4,7 @@ import operator
 import glob
 import time
 import collections
+import socket
 
 num_labellers_required_per_image = 3
 
@@ -106,6 +107,27 @@ def get_user_counts(data_dir):
 
     print "Getting user counts took %fs" % (time.time() - tic)
     return sorted_users
-    #
-    # unames, counts = zip(*sorted_users)
-    # return unames, counts
+
+
+def getpaths(debug):
+
+    host = socket.gethostname()
+
+    if host == 'biryani':
+        if debug:
+            data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
+            yaml_name = 'sightings_subset.yaml'
+        else:
+            data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/butterfly_subset/'
+            yaml_name = 'butterflies.yaml'
+
+    elif host == 'oisin':
+        if debug:
+            data_dir = '~/butterflies/data/sightings_subset'
+            yaml_name = 'sightings_subset.yaml'
+        else:
+            raise Exception('Not ready for the real thing yet')
+    else:
+        raise Exception("Unknown host, expected 'oisin' or 'biryani'")
+
+    return data_dir, yaml_name

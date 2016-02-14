@@ -30,7 +30,7 @@
 
   function bad_image()
   {
-    return !document.getElementById("one_butterfly").checked;
+    return !(document.getElementById("one_butterfly").checked);
   }
 
   function cropped()
@@ -47,14 +47,10 @@
       $(".container > img").cropper("clear");
       $(".img-container > img").cropper("clear");
       $(".img-container > img").cropper("disable");
-      $(".popup").show();
       $(".onlyone").css("visibility", "hidden");
-      // $("#hiddensubmitter").css("visibility", "visible");
     }
     else {
-      // $("#hiddensubmitter").css("visibility", "hidden");
       $(".img-container > img").cropper("enable");
-      $(".popup").hide();
       $(".onlyone").css("visibility", "visible");
     }
 
@@ -75,18 +71,15 @@
 {% endblock %}
 
 {% block body %}
-<div id='popup1' class='popup'></div>
 
 <div id="container">
-  <!-- <div class="title">
-      <h1>Cropping butterflies</h1>
-  </div> -->
-
   <div id="content">
     <form id="main_form" method="post" action="{{ url_for('form_submission') }}">
 
       <div class="formgroup">
-        <p class="textboxlabel">How many butterflies are in the image below?</p>
+        <p class="textboxlabel">How many butterflies are in the image below?<span style="margin-left: 10px; float: right;">
+          <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#howmanymodal">Help</button>
+        </span></p>
         <span class="btn-group" id="howmany" data-toggle="buttons">
           <label class="btn btn-default">
               <input type="radio" name="number_butterflies" id="zero_butterflies"
@@ -101,14 +94,14 @@
           </label>
         </span>
         <span style="margin-left: 30px;">
-          <!-- <label class="btn btn-primary"> -->
-            <button type="submit" id="submitter" class="btn btn-primary">Submit</button>
-          <!-- </label> -->
+          <button type="submit" id="submitter" class="btn btn-primary" disabled="">Submit</button>
         </span>
       </div>
 
       <div class="onlyone formgroup">
-        <p  class="textboxlabel">Can you see the top of the wings, the bottom or both?</p>
+        <p  class="textboxlabel">Can you see the top of the wings, the bottom or both?<span style="margin-left: 10px; float: right;">
+          <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#topbottom">Help</button>
+        </span></p>
         <div class="btn-group"  data-toggle="buttons">
           <label class="btn btn-default wing-side">
             <input type="radio" name="topbottom" value="Top" onchange="checkform()">Top
@@ -123,7 +116,9 @@
       </div>
 
       <div class="formgroup">
-        <p class="onlyone textboxlabel">Please draw a box tightly cropping the butterfly's wings:</p>
+        <p class="onlyone textboxlabel">Please draw a box tightly cropping the butterfly's wings:<span style="margin-left: 10px; float: right;">
+          <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#croppingbox">Help</button>
+        </span></p>
         <div class="img-container" id="imageholder" style="color:#0000FF">
           <div id="horizontal"></div>
           <div id="vertical"></div>
@@ -133,7 +128,6 @@
 
       <script>
       $('.img-container > img').cropper({
-        //aspectRatio: 16 / 9,
         autoCrop: false,
         viewMode: 1,
         background: false,
@@ -152,17 +146,21 @@
       });
       </script>
 
-      <div class="formgroup">
+      <div class="formgroup" id="textboxinput">
         <input type="text" name="x" id="x" hidden />
         <input type="text" name="y" id="y" hidden />
         <input type="text" name="width" id="width" hidden />
         <input type="text" name="height" id="height" hidden />
         <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} hidden />
         <input type="text" name="img_id" id="img_id" value={{ img_id }} hidden />
-        <p  class="onlyone textboxlabel">Enter notes here
-          <span class="grey">&mdash; e.g. 'blurry', 'very small', or 'broken wings'</span>
-        </p>
-        <input type="text" name="notes" size="100" id="notes" class="form-control onlyone" />
+
+        <button data-toggle="collapse" data-target="#demo" type="button" class="btn btn-default onlyone">Enter notes</button>
+        <div id="demo" class="collapse" style='margin-top: 10px'>
+          <p class="onlyone textboxlabel">Enter notes here
+            <span class="grey">&mdash; e.g. 'blurry' or 'very small'.</br>Only bother with this in exceptional circumstances, e.g. one image in 50 or so.</span>
+          </p>
+          <input type="text" name="notes" size="100" id="notes" class="form-control onlyone" />
+        </div>
       </div>
 
       <hr/>
@@ -173,5 +171,100 @@
 
     </form>
   </div>
+
+  <!-- Modal -->
+  <div id="howmanymodal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">How many butterflies?</h4>
+        </div>
+        <div class="modal-body">
+          <p>Click on the number of butterflies you can see, after a second or two looking, in the image. Here are some examples: </p>
+          <div>
+            <div style="float: left; width: 33%; padding: 10px;">
+              <img src="../static/zero.jpg" width="100%" />
+              <p style="text-align: center;">Zero</p>
+            </div>
+            <div style="float: left; width: 33%; left: 0%;  padding: 10px;">
+              <img src="../static/one.jpg" width="100%" />
+              <p style="text-align: center;">One</p>
+            </div>
+            <div style="float: left; width: 33%;  padding: 10px;">
+              <img src="../static/many.jpg" width="100%" />
+              <p style="text-align: center;">Many</p>
+            </div>
+          </div>
+          <p>Note that caterpillars, eggs or larvae count as 'Zero'.</p>
+          <p>'Zero' or 'Many' butterflies means your work is done! Click submit to move on.</p>
+          <p>Power users can use the 'z' key as a shortcut for 'Zero' + 'Submit'.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="topbottom" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Top, bottom, or both?</h4>
+        </div>
+        <div class="modal-body">
+          <p>We'd like to know if you can see the top of the butterfly wings, the bottom, or both. See the examples below:.</p>
+          <div>
+            <div style="float: left; width: 33%; padding: 10px;">
+              <img src="../static/top.jpg" width="100%" />
+              <p style="text-align: center;">Top</p>
+            </div>
+            <div style="float: left; width: 33%; left: 0%;  padding: 10px;">
+              <img src="../static/bottom.jpg" width="100%" />
+              <p style="text-align: center;">Bottom</p>
+            </div>
+            <div style="float: left; width: 33%;  padding: 10px;">
+              <img src="../static/both.jpg" width="100%" />
+              <p style="text-align: center;">Both</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="croppingbox" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Drawing a cropping box</h4>
+        </div>
+        <div class="modal-body">
+          <p>Todo.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 {% endblock %}
