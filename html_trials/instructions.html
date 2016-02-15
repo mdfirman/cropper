@@ -1,0 +1,65 @@
+<html>
+    <head>
+        <title>Butterfly cropping v0.1</title>
+        <!-- <script src="{{ url_for('static', filename='bootstrap.js') }}" type="text/javascript"></script> -->
+        <link rel="stylesheet" href="instruc.css">
+        <script>
+        $ = function(id) {
+          return document.getElementById(id);
+        }
+
+        var show = function(id, elm) {
+            $(id).style.top = elm.offsetTop;
+            $(id).style.left = elm.offsetLeft + elm.offsetWidth;
+        	$(id).style.display ='block';
+            console.log(elm.offsetTop)
+            console.log(elm)
+        }
+        var hide = function(id) {
+        	$(id).style.display ='none';
+        }
+        </script>
+    </head>
+    <body>
+
+<!--
+    <div id="container">
+        <div class="title">
+            <h1>Cropping Butterflies Instructions</h1>
+        </div>
+
+        <div id="content">
+
+            Hello!
+
+            Thanks for helping out with the butterfly cropping project. Your contributions are extremely valuable.
+
+            <a href="#" onclick="show('popup1')">Show popup (box-shadow)</a>
+        </div>
+    </div>
+        <div class="popup" id="popup1">
+          <p>This is a popup!</p>
+          <p>Overlay uses <b>box-shadow</b>.</p>
+        	<p>(Doesn't block elements on background)</p>
+          <a href="#" onclick="hide('popup1')">Ok!</a>
+        </div> -->
+        <div>
+        <a href="#" onclick="show('popup1', this)">Show popup (box-shadow)</a>
+        </div>
+<a href="#" onclick="show('popup2')">Show popup (:before & :after)</a>
+
+<div class="popup" id="popup1">
+  <p>This is a popup!</p>
+  <p>Overlay uses <b>box-shadow</b>.</p>
+	<p>(Doesn't block elements on background)</p>
+  <a href="#" onclick="hide('popup1')">Ok!</a>
+</div>
+
+<div class="popup" id="popup2">
+  <p>This is a popup!</p>
+  <p>Overlay uses <b>:before</b> and <b>:after</b> pseudo-classes.</p>
+	<p>(This one does block elements on the background)</p>
+  <a href="#" onclick="hide('popup2')">Ok!</a>
+</div>
+    </body>
+</html>
