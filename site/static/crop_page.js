@@ -18,7 +18,7 @@ function bad_image()
 
 function cropped()
 {
-  return document.getElementById("x").value != "";
+  return Number(document.getElementById("x").value) > 0;
 }
 
 // http://stackoverflow.com/questions/13931688/disable-enable-submit-button-until-all-forms-have-been-filled

@@ -83,9 +83,15 @@ def remember_user_labelling(sighting_id, img_id, username):
 @app.route('/<sighting_id>/<img_id>')
 def download_image(sighting_id, img_id):
     print sighting_id, img_id
-    print "In app", data_dir + sighting_id, img_id
     return send_from_directory(data_dir + sighting_id, img_id,
         as_attachment=True)
+
+# giving robots.txt to prevent crawlers
+@app.route('/robots.txt')
+def robots():
+    response = make_response("User-agent: *\nDisallow: /")
+    response.headers["content-type"] = "text/plain"
+    return response
 
 
 # Define a route for the default URL, which loads the form
@@ -139,15 +145,21 @@ def form_submission():
         pass
 
     # save the results to disk
-    sighting_id = request.form['sighting_id']
-    img_id = request.form['img_id']
-    savepath = data_dir + sighting_id + '/' + \
-        img_id.split('.')[0] + '_' + g.user.username + '_crop.yaml'
+    try:
+        sighting_id = request.form['sighting_id']
+        img_id = request.form['img_id']
+        savepath = data_dir + sighting_id + '/' + \
+            img_id.split('.')[0] + '_' + g.user.username + '_crop.yaml'
 
-    remember_user_labelling(sighting_id, img_id.split('.')[0], g.user.username)
+        remember_user_labelling(
+            sighting_id, img_id.split('.')[0], g.user.username)
 
-    with open(savepath, 'w') as f:
-        yaml.dump(results, f)
+        with open(savepath, 'w') as f:
+            yaml.dump(results, f)
+
+    except Exception as e:
+        # todo - log this
+        print "Failed to save, ", e
 
     # get a new image from the set of unlabelled images
     new_tic = time.time()
@@ -162,6 +174,11 @@ def form_submission():
         print new_img_name
         return render_template('form_submit.html', sighting_id=new_sighting_id,
             img_id=new_img_name)
+
+
+@app.errorhandler(500)
+def error500(e):
+    return render_template('500.html'), 500
 
 
 @login_manager.user_loader
@@ -223,22 +240,15 @@ def logout():
 
 @app.route('/login',methods=['GET','POST'])
 def login():
-    print "Login"
     if request.method == 'GET':
-        print "Get method"
         return render_template('login.html', welcome=request.args.get('welcome'))
 
-    print "Post method"
     username = request.form['username']
-    print "Post method1"
     password = request.form['password']
-    print "Post method2"
     registered_user = load_user(username, password)
-    print "Post method3"
 
     if registered_user is None:
         return render_template('login.html', error = "Error - Username or Password is invalid")
-    print "Post method4"
 
     login_user(registered_user)
     print 'Logged in successfully'

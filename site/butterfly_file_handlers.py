@@ -80,8 +80,6 @@ def build_unlabelled_img_set(data_dir, yaml_name):
 
     # todo - after user submits, we need to add their name to the set and remove if needed
 
-    print yaml.dump(who_labelled_what)
-
     if len(who_labelled_what) == 0:
         print "No unlabelled images!"
 
@@ -102,7 +100,6 @@ def get_user_counts(data_dir):
     start = len(data_dir)
     for fname in fnames:
         username = fname[start:].split('_')[-2]
-        print 'Username', username
         uname_counts[username] += 1
 
     # sorting users
