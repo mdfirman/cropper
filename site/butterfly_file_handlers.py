@@ -50,7 +50,9 @@ def build_unlabelled_img_set(data_dir, yaml_name):
 
     for crop_path in crop_paths:
         sighting_id, tmp = crop_path[start:].split('/')
-        img_id, user, _ = tmp.split('_')
+        splitup = tmp.split('_')
+        user = splitup[-2]
+        img_id = '_'.join(splitup[:-2])
         who_labelled_what[(sighting_id, img_id)]['labellers'].add(user)
 
     # sort the dictionary by how many times each item has been labelled
@@ -99,7 +101,8 @@ def get_user_counts(data_dir):
     fnames = glob.glob(data_dir + '/*/*_crop.yaml')
     start = len(data_dir)
     for fname in fnames:
-        username = fname[start:].split('_')[1]
+        username = fname[start:].split('_')[-2]
+        print 'Username', username
         uname_counts[username] += 1
 
     # sorting users
@@ -115,8 +118,8 @@ def getpaths(debug):
 
     if host == 'biryani':
         if debug:
-            data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_subset/'
-            yaml_name = 'sightings_subset.yaml'
+            data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_tmp_for_beta/'
+            yaml_name = 'butterflies_for_beta_website.yaml'
         else:
             data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/butterfly_subset/'
             yaml_name = 'butterflies.yaml'

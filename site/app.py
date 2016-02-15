@@ -108,7 +108,8 @@ def form():
 @app.route('/leaderboard')
 def leaderboard():
     user_counts = get_user_counts(data_dir)
-    user_counts.append(('Mark', max([xx for _, xx in user_counts]) + 10))
+    if user_counts:
+        user_counts.append(('Mark', max([xx for _, xx in user_counts]) + 10))
     user_counts = [[str(xx), float(yy)] for xx, yy in user_counts][::-1]
     return render_template('leaderboard.html', user_counts=user_counts)
 
