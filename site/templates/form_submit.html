@@ -27,6 +27,10 @@ Sighting ID: 359018
 
 Image ID: 5f56eb88830119d3f49ea58e81df915d.jpg -->
 <!-- http://stackoverflow.com/questions/21626048/unable-to-pass-jinja2-variables-into-javascript-snippet -->
+<!-- Sighting ID: 46614
+
+Image ID: 117a17fb02e33cbefa99af27b4be6064_0.jpg -->
+
 <!-- Dummy variable to store the training phase -->
 <meta id="my-data" data-trainstep="{{ training_step }}">
 
@@ -34,14 +38,14 @@ Image ID: 5f56eb88830119d3f49ea58e81df915d.jpg -->
   <div id="content">
     <form id="main_form" method="post" action="{{ url_for('form_submission') }}">
 
-      {% if training_step <= 3 %}
+      {% if training_step <= 5 %}
       <div class="alert alert-info" role="alert">
-        <p><strong>Training step {{ training_step }} of 3</strong></p>
+        <p><strong>Training step {{ training_step }} of 5</strong></p>
         <p>For the first few images we will guide you to becoming a butterfly expert.</p>
         <p>Start by answering the first question. Note we don't count caterpillars as butterflies. Click 'help' on the right for more info.</p>
       </div>
       {% endif %}
-      {% if training_step == 4 %}
+      {% if training_step == 6 %}
       <div class="alert alert-info" role="alert">
         <p><strong>Great!</strong> Now you're ready to crop by yourself. Good luck and have fun!</p>
       </div>
@@ -68,7 +72,7 @@ Image ID: 5f56eb88830119d3f49ea58e81df915d.jpg -->
                 value="One" id="one_butterfly" onchange="checkform()" >One
           </label>
           <label class="btn btn-default" onchange="checkform()" >
-            <input type="radio" name="number_butterflies"  value="Many">Many
+            <input type="radio" name="number_butterflies" id="many_butterflies" value="Many">Many
           </label>
         </span>
         <!-- <a href="#" data-toggle="popover" title="" data-content="How many butterflies  can you see in the image below? Note that caterpilars and larvae don't count as butterflies. ">.</a> -->
@@ -117,6 +121,12 @@ Image ID: 5f56eb88830119d3f49ea58e81df915d.jpg -->
             <img width="100%" src="../static/training_1.jpg">
           {% elif training_step == 2 %}
             <img width="100%" src="../static/training_2.jpg">
+          {% elif training_step == 3 %}
+            <img width="100%" src="../static/training_3.jpg">
+          {% elif training_step == 4 %}
+            <img width="100%" src="../static/training_4.jpg">
+          {% elif training_step == 5 %}
+            <img width="100%" src="../static/training_5.jpg">
           {% else %}
             <img width="100%" src="{{ url_for('download_image', sighting_id=sighting_id, img_id=img_id) }}">
           {% endif %}

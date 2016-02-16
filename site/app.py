@@ -30,6 +30,10 @@ app.jinja_env.add_extension("chartkick.ext.charts")
 
 # setting some constants
 debug = True
+training_debug = True
+if socket.gethostname() == 'oisin' and training_debug:
+    raise Exception("Should not be allowed")
+
 num_labellers_required_per_image = 3
 data_dir, yaml_name = getpaths(debug)
 
@@ -163,25 +167,26 @@ def form_submission():
         # todo - log this
         print "Failed to save, ", e
 
-    if session['training_step'] < 3:
-        # decrease the training steps
-        session['training_step'] += 1
+    if training_debug:
+        session['training_step'] = (session['training_step'] + 1 % 5) + 1
         print "Training step : ", session['training_step']
 
-        render_template('form_submit.html',
-                       sighting_id=new_sighting_id,
-                       img_id=new_img_name,
-                       training_step=session['training_step'])
+        render_template('form_submit.html', sighting_id='', img_id='',
+            training_step=session['training_step'])
 
-    elif session['training_step'] == 3:
-        # save to disk the fact that the user has finished their training
-        #
-        # g.user.current_train_step = 0
-        # g.user.dump()
-        session['training_step'] += 1
+    else:
+        if session['training_step'] < 5:
+            # increase the training steps
+            session['training_step'] += 1
+            print "Training step : ", session['training_step']
 
-    elif session['training_step'] > 3:
-        session['training_step'] = 1
+            render_template('form_submit.html', sighting_id='', img_id='',
+                training_step=session['training_step'])
+
+        elif session['training_step'] == 5:
+            # save to disk the fact that the user has finished their training
+            g.user.current_train_step = 0
+            g.user.dump()
 
     # get a new image from the set of unlabelled images
     new_tic = time.time()
