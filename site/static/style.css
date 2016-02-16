@@ -31,3 +31,26 @@ h2 {
 .txtli {
   margin-bottom: 5px;
 }
+.popover-example .popover {
+  position: absolute;
+  display: inline-block;
+  margin: 0px;
+}
+.popover {
+  background-color: #d9edf7;
+  margin-top: 0px;
+  color: black;
+  z-index: 50;
+}
+.popover.right .arrow:after {
+  border-right-color: #d9edf7;
+}
+.popover.bottom .arrow:after {
+  border-bottom-color: #d9edf7;
+}
+.training {
+  color: blue;
+}
+.modal-content {
+  z-index: 100;
+}

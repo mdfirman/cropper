@@ -106,9 +106,11 @@ def form():
     else:
         # start the clock and render the new page
         session['tic'] = time.time()
-        print new_img_name
-        return render_template('form_submit.html', sighting_id=new_sighting_id,
-            img_id=new_img_name)
+        print "User has remaining...", session['training_step']
+        return render_template('form_submit.html',
+                               sighting_id=new_sighting_id,
+                               img_id=new_img_name,
+                               training_step=session['training_step'])
 
 
 @app.route('/leaderboard')
@@ -161,6 +163,26 @@ def form_submission():
         # todo - log this
         print "Failed to save, ", e
 
+    if session['training_step'] < 3:
+        # decrease the training steps
+        session['training_step'] += 1
+        print "Training step : ", session['training_step']
+
+        render_template('form_submit.html',
+                       sighting_id=new_sighting_id,
+                       img_id=new_img_name,
+                       training_step=session['training_step'])
+
+    elif session['training_step'] == 3:
+        # save to disk the fact that the user has finished their training
+        #
+        # g.user.current_train_step = 0
+        # g.user.dump()
+        session['training_step'] += 1
+
+    elif session['training_step'] > 3:
+        session['training_step'] = 1
+
     # get a new image from the set of unlabelled images
     new_tic = time.time()
     new_sighting_id, new_img_id, new_img_name = get_new_images(g.user.username)
@@ -172,8 +194,10 @@ def form_submission():
         # start the clock and render the new page
         session['tic'] = time.time()
         print new_img_name
-        return render_template('form_submit.html', sighting_id=new_sighting_id,
-            img_id=new_img_name)
+        return render_template('form_submit.html',
+                               sighting_id=new_sighting_id,
+                               img_id=new_img_name,
+                               training_step=session['training_step'])
 
 
 @app.errorhandler(500)
@@ -249,6 +273,8 @@ def login():
 
     if registered_user is None:
         return render_template('login.html', error = "Error - Username or Password is invalid")
+
+    session['training_step'] = registered_user.current_train_step
 
     login_user(registered_user)
     print 'Logged in successfully'

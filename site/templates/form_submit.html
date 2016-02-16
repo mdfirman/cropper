@@ -4,17 +4,60 @@
 <link  href="{{ url_for('static', filename='cropper.min.css') }}" rel="stylesheet">
 <script src="{{ url_for('static', filename='cropper.min.js') }}" type="text/javascript"></script>
 <script src="../static/crop_page.js" type="text/javascript" language="javascript"></script>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover({container: 'body'});
+    $('[data-toggle="popover"]').popover('show');
+    $('#submit-popover').popover('hide')
+    if (parseInt($('#my-data').data().trainstep) == 2) {
+      $('#topbottompopover').popover('show')
+    }
+    else {
+      $('#topbottompopover').popover('hide')
+    }
+    console.log('Turning off')
+});
+
+</script>
 {% endblock %}
 
 {% block body %}
+<!--
+Sighting ID: 359018
+
+Image ID: 5f56eb88830119d3f49ea58e81df915d.jpg -->
+<!-- http://stackoverflow.com/questions/21626048/unable-to-pass-jinja2-variables-into-javascript-snippet -->
+<!-- Dummy variable to store the training phase -->
+<meta id="my-data" data-trainstep="{{ training_step }}">
+
 <div id="container">
   <div id="content">
     <form id="main_form" method="post" action="{{ url_for('form_submission') }}">
 
+      {% if training_step <= 3 %}
+      <div class="alert alert-info" role="alert">
+        <p><strong>Training step {{ training_step }} of 3</strong></p>
+        <p>For the first few images we will guide you to becoming a butterfly expert.</p>
+        <p>Start by answering the first question. Note we don't count caterpillars as butterflies. Click 'help' on the right for more info.</p>
+      </div>
+      {% endif %}
+      {% if training_step == 4 %}
+      <div class="alert alert-info" role="alert">
+        <p><strong>Great!</strong> Now you're ready to crop by yourself. Good luck and have fun!</p>
+      </div>
+      {% endif %}
+
+
       <div class="formgroup">
         <p class="textboxlabel">How many butterflies are in the image below?<span style="margin-left: 10px; float: right;">
-          <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#howmanymodal">Help</button>
-        </span></p>
+
+
+            <button type="button" class="btn btn-default btn-success btn-xs" data-toggle="modal" data-target="#howmanymodal">Help</button>
+
+        </span>
+
+      </p>
+
         <span class="btn-group" id="howmany" data-toggle="buttons">
           <label class="btn btn-default">
               <input type="radio" name="number_butterflies" id="zero_butterflies"
@@ -28,38 +71,55 @@
             <input type="radio" name="number_butterflies"  value="Many">Many
           </label>
         </span>
+        <!-- <a href="#" data-toggle="popover" title="" data-content="How many butterflies  can you see in the image below? Note that caterpilars and larvae don't count as butterflies. ">.</a> -->
         <span style="margin-left: 30px;">
+          <a href="#" data-toggle="popover" title="" data-content="Great! Click submit to continue." id="submit-popover">
           <button type="submit" id="submitter" class="btn btn-primary" disabled="">Submit</button>
+          </a>
         </span>
       </div>
 
       <div class="onlyone formgroup">
-        <p  class="textboxlabel">Can you see the top of the wings, the bottom or both?<span style="margin-left: 10px; float: right;">
-          <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#topbottom">Help</button>
-        </span></p>
-        <div class="btn-group"  data-toggle="buttons">
-          <label class="btn btn-default wing-side">
-            <input type="radio" name="topbottom" value="Top" onchange="checkform()">Top
-          </label>
-          <label class="btn btn-default wing-side">
-            <input type="radio" name="topbottom" onchange="checkform()" value="Bottom">Bottom
-          </label>
-          <label class="btn btn-default wing-side">
-            <input type="radio" name="topbottom" onchange="checkform()" value="Both">Both
-          </label>
-        </div>
+        <p  class="textboxlabel">Can you see the top of the wings, the bottom or both?
+          <span style="margin-left: 10px; float: right;">
+            <button type="button" class="btn btn-success btn-default btn-success btn-xs" data-toggle="modal" data-target="#topbottom">Help</button>
+          </span>
+        </p>
+          <span class="btn-group"  data-toggle="buttons" id="topbottom-btngroup">
+            <label class="btn btn-default wing-side">
+              <input type="radio" name="topbottom" value="Top" id="topside" onchange="checkform()">Top
+            </label>
+            <label class="btn btn-default wing-side">
+              <input type="radio" name="topbottom" id="bottomside" onchange="checkform()" value="Bottom">Bottom
+            </label>
+            <label class="btn btn-default wing-side">
+              <input type="radio" name="topbottom" id="bothside" onchange="checkform()" value="Both">Both
+            </label>
+          </span>
+            <span>
+              <a id="topbottompopover">&#x200b;</a>
+            </span>
       </div>
+
 
       <div class="formgroup">
         <p class="onlyone textboxlabel">Please draw a box tightly cropping the butterfly's wings:
-          <span class="grey small"><br>Ignore the antennae, body and legs. We only care about the wings.</span>
           <span style="margin-left: 10px; float: right;">
-          <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#croppingbox">Help</button>
-        </span></p>
+          <button type="button" class="btn btn-default btn-success btn-xs" data-toggle="modal" data-target="#croppingbox">Help</button>
+          </span>
+          <span class="grey small"><br>Ignore the antennae, body and legs. We only care about the wings.</span>
+        </p>
+        <div class="alert alert-info" role="alert" id="cropping-helper" style="display: none; margin-bottom: 5px;">
+          <p class="small" id="cropping-helper-text">We've drawn a dotted line to guide you on this one. Click and drag to draw your box. You can adjust the box by dragging the sides.</p>
+        </div>
         <div class="img-container" id="imageholder" style="color:#0000FF">
-          <div id="horizontal"></div>
-          <div id="vertical"></div>
-          <img width="100%" src="{{ url_for('download_image', sighting_id=sighting_id, img_id=img_id) }}">
+          {% if training_step == 1 %}
+            <img width="100%" src="../static/training_1.jpg">
+          {% elif training_step == 2 %}
+            <img width="100%" src="../static/training_2.jpg">
+          {% else %}
+            <img width="100%" src="{{ url_for('download_image', sighting_id=sighting_id, img_id=img_id) }}">
+          {% endif %}
         </div>
       </div>
 
@@ -84,10 +144,10 @@
       </script>
 
       <div class="formgroup" id="textboxinput">
-        <input type="text" name="x" id="x" hidden />
-        <input type="text" name="y" id="y" hidden />
-        <input type="text" name="width" id="width" hidden />
-        <input type="text" name="height" id="height" hidden />
+        <input type="text" name="x" id="x" />
+        <input type="text" name="y" id="y" />
+        <input type="text" name="width" id="width"  />
+        <input type="text" name="height" id="height"  />
         <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} hidden />
         <input type="text" name="img_id" id="img_id" value={{ img_id }} hidden />
 

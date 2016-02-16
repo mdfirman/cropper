@@ -26,6 +26,7 @@ class User():
         usr.hashed_password = bcrypt.hashpw(password.encode('utf-8'), usr.salt)
         usr.email = email
         usr.registered_on = datetime.utcnow()
+        usr.current_train_step = 3  # each user has to complete 2 training steps
         return usr
 
     # overload init
@@ -39,11 +40,14 @@ class User():
     @classmethod
     def from_id(cls, id):
         fname = users_folder + id.lower() + '.yaml'
-        print "Loading"
+        print "Loading", fname
         # check user exists in our 'database'
         if os.path.exists(fname):
             # load user from file
-            return  User.from_dict(yaml.load(open(fname)))
+            usr = User.from_dict(yaml.load(open(fname)))
+            if not hasattr(usr, 'current_train_step'):
+                usr.current_train_step = 1
+            return usr
         else:
             return None
 
