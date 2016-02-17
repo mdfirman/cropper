@@ -33,6 +33,9 @@
             <li {% if request.path == '/cropper' %}class="active"{% endif %}>
               <a href="/cropper">Crop</a>
             </li>
+            <li {% if request.path == '/training' %}class="active"{% endif %}>
+              <a href="/training">Training</a>
+            </li>
           {% endif %}
           <li {% if request.path == '/leaderboard' %}class="active"{% endif %}>
             <a href="/leaderboard">Leaderboard</a>

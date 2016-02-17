@@ -38,16 +38,28 @@ Image ID: 117a17fb02e33cbefa99af27b4be6064_0.jpg -->
   <div id="content">
     <form id="main_form" method="post" action="{{ url_for('form_submission') }}">
 
-      {% if training_step <= 5 %}
+      {% if training_step == 1 %}
       <div class="alert alert-info" role="alert">
         <p><strong>Training step {{ training_step }} of 5</strong></p>
         <p>For the first few images we will guide you to becoming a butterfly expert.</p>
         <p>Start by answering the first question. Note we don't count caterpillars as butterflies. Click 'help' on the right for more info.</p>
       </div>
-      {% endif %}
-      {% if training_step == 6 %}
+      {% elif training_step == 2 %}
+      <div class="alert alert-info" role="alert">
+        <p><strong>Training step {{ training_step }} of 5</strong></p>
+        <p>Great work!</p>
+        <p>Now, we have the first image with a butterfly. Try to judge if you can see the top of the wings, the bottom or both sides. Click 'help' on the right for more info.</p>
+      </div>
+      {% elif training_step <= 5 %}
+      <div class="alert alert-info" role="alert">
+        <p><strong>Training step {{ training_step }} of 5</strong></p>
+        <p>Great work!</p>
+        <p>Keep going answering questions. Click 'help' on the right for more info.</p>
+      </div>
+      {% elif training_step == 6 or training_step == 7 %}
       <div class="alert alert-info" role="alert">
         <p><strong>Great!</strong> Now you're ready to crop by yourself. Good luck and have fun!</p>
+        <p>You can repeat this training at any time by clicking 'Training' in the menu above.</p>
       </div>
       {% endif %}
 
@@ -155,10 +167,10 @@ Image ID: 117a17fb02e33cbefa99af27b4be6064_0.jpg -->
       <div class="formgroup" id="textboxinput">
         <input type="text" name="x" id="x" hidden />
         <input type="text" name="y" id="y" hidden />
-        <input type="text" name="width" id="width" hidden  />
-        <input type="text" name="height" id="height" hidden  />
-        <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} hidden />
-        <input type="text" name="img_id" id="img_id" value={{ img_id }} hidden />
+        <input type="text" name="width" id="width" hidden />
+        <input type="text" name="height" id="height" hidden />
+        <input type="text" name="sighting_id" id="sighting_id" hidden value={{ sighting_id }} />
+        <input type="text" name="img_id" id="img_id" hidden value={{ img_id }}  />
 
         <button data-toggle="collapse" data-target="#demo" type="button" class="btn btn-default onlyone">Enter notes</button>
         <div id="demo" class="collapse" style='margin-top: 10px'>

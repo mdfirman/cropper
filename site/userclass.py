@@ -28,7 +28,7 @@ class User():
         usr.hashed_password = bcrypt.hashpw(password.encode('utf-8'), usr.salt)
         usr.email = email
         usr.registered_on = datetime.utcnow()
-        usr.current_train_step = 1  # each user has to complete all the training steps
+        usr.done_training = False  # each user has to complete all the training steps
         return usr
 
     # overload init
@@ -47,8 +47,8 @@ class User():
         if os.path.exists(fname):
             # load user from file
             usr = User.from_dict(yaml.load(open(fname)))
-            if not hasattr(usr, 'current_train_step'):
-                usr.current_train_step = 1
+            if not hasattr(usr, 'done_training'):
+                usr.done_training = False
             return usr
         else:
             return None
