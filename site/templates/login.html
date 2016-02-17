@@ -6,7 +6,9 @@
       <p class=error style="color:red"><strong>Error:</strong> {{ error }}
     {% endif %}
     {% if welcome %}
-      <p class=error style="color:blue">Thanks for registering! Now log in below to get started.</p>
+      <div class="alert alert-info" role="alert">
+        <p>Thanks for registering! Now log in below to get started.</p>
+      </div>
     {% endif %}
     <div class="control-group">
         <p class="textboxlabel">Username</p>

@@ -26,7 +26,7 @@ class User():
         usr.hashed_password = bcrypt.hashpw(password.encode('utf-8'), usr.salt)
         usr.email = email
         usr.registered_on = datetime.utcnow()
-        usr.current_train_step = 1  # each user has to complete 2 training steps
+        usr.current_train_step = 1  # each user has to complete all the training steps
         return usr
 
     # overload init

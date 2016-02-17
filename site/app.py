@@ -29,8 +29,8 @@ app.register_blueprint(ck, url_prefix='/ck')
 app.jinja_env.add_extension("chartkick.ext.charts")
 
 # setting some constants
-debug = True
-training_debug = True
+debug = False
+training_debug = False
 if socket.gethostname() == 'oisin' and training_debug:
     raise Exception("Should not be allowed")
 
@@ -168,16 +168,17 @@ def form_submission():
         print "Failed to save, ", e
 
     if training_debug:
-        session['training_step'] = (session['training_step'] + 1 % 5) + 1
+        session['training_step'] = (session['training_step'] % 6) + 1
         print "Training step : ", session['training_step']
 
         render_template('form_submit.html', sighting_id='', img_id='',
             training_step=session['training_step'])
 
     else:
+        session['training_step'] += 1
+
         if session['training_step'] < 5:
             # increase the training steps
-            session['training_step'] += 1
             print "Training step : ", session['training_step']
 
             render_template('form_submit.html', sighting_id='', img_id='',
@@ -185,7 +186,9 @@ def form_submission():
 
         elif session['training_step'] == 5:
             # save to disk the fact that the user has finished their training
-            g.user.current_train_step = 0
+            # when we get to 5. We allow counter to increase to 6 to allow for
+            # a final message to be shown
+            g.user.current_train_step = 7
             g.user.dump()
 
     # get a new image from the set of unlabelled images

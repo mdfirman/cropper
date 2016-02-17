@@ -77,14 +77,13 @@ Image ID: 117a17fb02e33cbefa99af27b4be6064_0.jpg -->
         </span>
         <!-- <a href="#" data-toggle="popover" title="" data-content="How many butterflies  can you see in the image below? Note that caterpilars and larvae don't count as butterflies. ">.</a> -->
         <span style="margin-left: 30px;">
-          <a href="#" data-toggle="popover" title="" data-content="Great! Click submit to continue." id="submit-popover">
           <button type="submit" id="submitter" class="btn btn-primary" disabled="">Submit</button>
-          </a>
+          <a href="#" data-toggle="popover" title="" data-content="Great! Click submit to continue." id="submit-popover">&#x200b;</a>
         </span>
       </div>
 
       <div class="onlyone formgroup">
-        <p  class="textboxlabel">Can you see the top of the wings, the bottom or both?
+        <p  class="textboxlabel">Can you mostly see the top of the wings, the bottom or both?
           <span style="margin-left: 10px; float: right;">
             <button type="button" class="btn btn-success btn-default btn-success btn-xs" data-toggle="modal" data-target="#topbottom">Help</button>
           </span>
@@ -154,17 +153,17 @@ Image ID: 117a17fb02e33cbefa99af27b4be6064_0.jpg -->
       </script>
 
       <div class="formgroup" id="textboxinput">
-        <input type="text" name="x" id="x" />
-        <input type="text" name="y" id="y" />
-        <input type="text" name="width" id="width"  />
-        <input type="text" name="height" id="height"  />
+        <input type="text" name="x" id="x" hidden />
+        <input type="text" name="y" id="y" hidden />
+        <input type="text" name="width" id="width" hidden  />
+        <input type="text" name="height" id="height" hidden  />
         <input type="text" name="sighting_id" id="sighting_id" value={{ sighting_id }} hidden />
         <input type="text" name="img_id" id="img_id" value={{ img_id }} hidden />
 
         <button data-toggle="collapse" data-target="#demo" type="button" class="btn btn-default onlyone">Enter notes</button>
         <div id="demo" class="collapse" style='margin-top: 10px'>
           <p class="onlyone textboxlabel">
-            <span class="grey small">e.g. 'blurry' or 'very small'.</br>Only bother with this in exceptional circumstances, perhaps one image in every 50.</span>
+            <span class="grey small">e.g. 'blurry', 'very small' or 'broken wings'.</br>Only bother with this in exceptional circumstances, perhaps one image in every 50.</span>
           </p>
           <input type="text" name="notes" size="100" id="notes" class="form-control onlyone" />
         </div>

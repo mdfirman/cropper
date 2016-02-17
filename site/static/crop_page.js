@@ -100,7 +100,8 @@ function checkform()
 
     $('a#topbottompopover').popover({ trigger: 'manual', placement: 'right'});
 
-    var enabled = document.getElementById("bothside").checked && goodcropstep2();
+    var enabled = document.getElementById("topside").checked && goodcropstep2();
+    console.log(enabled);
     document.getElementById('submitter').disabled = !enabled;
 
     if (document.getElementById("topside").checked) {
@@ -136,7 +137,7 @@ function checkform()
 
     $('a#topbottompopover').popover({ trigger: 'manual', placement: 'right'});
 
-  var enabled = document.getElementById("bothside").checked && goodcropstep3();
+  var enabled = document.getElementById("bottomside").checked && goodcropstep3();
   document.getElementById('submitter').disabled = !enabled;
 
     if (document.getElementById("bottomside").checked) {
