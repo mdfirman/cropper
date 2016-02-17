@@ -2,6 +2,8 @@ import bcrypt
 import yaml
 import os
 from datetime import datetime
+import logging
+logger = logging.getLogger()
 
 users_folder = '../data/users/'
 
@@ -15,7 +17,7 @@ class User():
         # check if user exists
         usernamepath = users_folder + username.lower() + '.yaml'
         if os.path.exists(usernamepath):
-            print "Username exists"
+            logger.info("Username %s exists" % username)
             return None
 
         usr = cls()
@@ -40,7 +42,7 @@ class User():
     @classmethod
     def from_id(cls, id):
         fname = users_folder + id.lower() + '.yaml'
-        print "Loading", fname
+        logger.info("Loading user %s" % id)
         # check user exists in our 'database'
         if os.path.exists(fname):
             # load user from file
@@ -73,5 +75,4 @@ class User():
     def pw_correct(self, pw_guess):
         hashed_guess = bcrypt.hashpw(pw_guess.encode('utf-8'), self.salt)
         correct = self.hashed_password == hashed_guess
-        print "Correct: ", correct
         return correct

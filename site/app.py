@@ -9,10 +9,14 @@ from flask import Flask,session, request, flash, url_for, redirect, render_templ
 from flask.ext.login import login_user , logout_user , current_user , login_required
 from flask.ext.login import LoginManager
 
-from butterfly_file_handlers import build_unlabelled_img_set, get_user_counts, getpaths
+from butterfly_file_handlers import build_unlabelled_img_set, get_user_counts, getpaths, logfilename
 from userclass import User
 
 import chartkick
+import logging
+logging.basicConfig(level=logging.DEBUG, filename=logfilename())
+logging.getLogger().addHandler(logging.StreamHandler())
+logger = logging.getLogger()
 
 
 # Initialize the Flask application and login manager
@@ -29,7 +33,7 @@ app.register_blueprint(ck, url_prefix='/ck')
 app.jinja_env.add_extension("chartkick.ext.charts")
 
 # setting some constants
-debug = False
+debug = True
 training_debug = False
 if socket.gethostname() == 'oisin' and training_debug:
     raise Exception("Should not be allowed")
@@ -46,21 +50,25 @@ def get_new_images(username):
     '''
     Returns a tuple with info about an image suitable for this user to label
     '''
+    logger.info("Checking for new images")
     global unlabelled_imgs
 
     if not unlabelled_imgs:
         # might have run out, or might have missed one. Check all the files...
-        print "Checking again..."
+        logger.info("Checking again for new images")
         unlabelled_imgs = build_unlabelled_img_set(data_dir, yaml_name)
 
         # now check again, if still empty then we're done
         if not unlabelled_imgs:
+            logger.critical("Can't find any more unlabelled images")
             return None, None, None
 
     # iterate until we have found one that this user hasn't labelled
     for (sighting_id, img_id), tmp in unlabelled_imgs.iteritems():
         if username not in tmp['labellers']:
             return sighting_id, img_id, tmp['img_name']
+
+    logger.warning("No more unlabelled images for user %s" % username)
 
     # should only get here if this user has labelled all the images which
     # haven't been labelled enough
@@ -79,20 +87,20 @@ def remember_user_labelling(sighting_id, img_id, username):
     num_labellers = len(unlabelled_imgs[(sighting_id, img_id)]['labellers'])
 
     if num_labellers >= num_labellers_required_per_image:
-        print "Removing image %s, %s" % (sighting_id, img_id)
+        logger.info("Removing image %s, %s" % (sighting_id, img_id))
         del unlabelled_imgs[(sighting_id, img_id)]
 
 
 # this gets a specific image file, and is used in the form_submit.html
 @app.route('/<sighting_id>/<img_id>')
 def download_image(sighting_id, img_id):
-    print sighting_id, img_id
     return send_from_directory(data_dir + sighting_id, img_id,
         as_attachment=True)
 
 # giving robots.txt to prevent crawlers
 @app.route('/robots.txt')
 def robots():
+    logger.info("Robots page requested")
     response = make_response("User-agent: *\nDisallow: /")
     response.headers["content-type"] = "text/plain"
     return response
@@ -103,6 +111,7 @@ def robots():
 @login_required
 def form():
     '''This is run the first time the page is loaded'''
+    logger.info("First time loading cropper for user %s" % g.user.username)
     new_sighting_id, new_img_id, new_img_name = get_new_images(g.user.username)
 
     if new_sighting_id is None:
@@ -110,7 +119,6 @@ def form():
     else:
         # start the clock and render the new page
         session['tic'] = time.time()
-        print "User has remaining...", session['training_step']
         return render_template('form_submit.html',
                                sighting_id=new_sighting_id,
                                img_id=new_img_name,
@@ -119,6 +127,7 @@ def form():
 
 @app.route('/leaderboard')
 def leaderboard():
+    logging.info("Serving leaderboard to user %s" % g.user.username)
     user_counts = get_user_counts(data_dir)
     if user_counts:
         user_counts.append(('Mark', max([xx for _, xx in user_counts]) + 10))
@@ -151,35 +160,39 @@ def form_submission():
         pass
 
     # save the results to disk
+    sighting_id = request.form['sighting_id']
+    img_id = request.form['img_id']
+
     try:
-        sighting_id = request.form['sighting_id']
-        img_id = request.form['img_id']
         savepath = data_dir + sighting_id + '/' + \
             img_id.split('.')[0] + '_' + g.user.username + '_crop.yaml'
 
         remember_user_labelling(
             sighting_id, img_id.split('.')[0], g.user.username)
 
+        logging.info("Saving crop to %s" % savepath)
         with open(savepath, 'w') as f:
             yaml.dump(results, f)
 
     except Exception as e:
         # todo - log this
-        print "Failed to save, ", e
+        logger.error("Failed to save " + str(e))
+        logger.error("Sighting id: %s image id: %s " % (sighting_id, img_id))
 
     if training_debug:
         session['training_step'] = (session['training_step'] % 6) + 1
-        print "Training step : ", session['training_step']
 
         render_template('form_submit.html', sighting_id='', img_id='',
             training_step=session['training_step'])
 
     else:
+        # increase the training steps
         session['training_step'] += 1
 
         if session['training_step'] < 5:
-            # increase the training steps
-            print "Training step : ", session['training_step']
+
+            logger.info("User %s on training step : %d" % (
+                g.user.username, session['training_step']))
 
             render_template('form_submit.html', sighting_id='', img_id='',
                 training_step=session['training_step'])
@@ -188,20 +201,23 @@ def form_submission():
             # save to disk the fact that the user has finished their training
             # when we get to 5. We allow counter to increase to 6 to allow for
             # a final message to be shown
+            logger.info("User %s finished training" % g.user.username)
             g.user.current_train_step = 7
             g.user.dump()
 
     # get a new image from the set of unlabelled images
     new_tic = time.time()
     new_sighting_id, new_img_id, new_img_name = get_new_images(g.user.username)
-    print "Took %fs to get new images" % (time.time() - new_tic)
+    logger.info("Took %fs to get new images" % (time.time() - new_tic))
 
     if new_sighting_id is None:
         return render_template('form_finished.html')
     else:
         # start the clock and render the new page
         session['tic'] = time.time()
-        print new_img_name
+        logger.info("Serving %s, %s to user %s" % (
+            new_sighting_id, new_img_name, g.user.username))
+
         return render_template('form_submit.html',
                                sighting_id=new_sighting_id,
                                img_id=new_img_name,
@@ -230,12 +246,15 @@ def register():
         string.ascii_lowercase + string.ascii_uppercase + string.digits)
 
     if extra_letters:
+        logger.info("Failed to register user %s" % request.form['username'])
         return render_template(
             'register.html', error="Please make sure username"
             " contains letters and digits only, no funny business.")
 
     user = User.new_user(request.form['username'],
         request.form['password'], request.form['email'])
+
+    logger.info("Registered new user" % user.username)
 
     if user:
         user.dump()
@@ -280,12 +299,13 @@ def login():
     registered_user = load_user(username, password)
 
     if registered_user is None:
+        logger.warning("Incorrect username or pw: %s" % username)
         return render_template('login.html', error = "Error - Username or Password is invalid")
 
     session['training_step'] = registered_user.current_train_step
 
     login_user(registered_user)
-    print 'Logged in successfully'
+    logger.info("User %s logged in successfully" % username)
     return redirect('/')
 
 
@@ -296,7 +316,7 @@ def before_request():
 
 if __name__ == '__main__':
     app.secret_key = "\x7f\x83\x91\xb6O\x0b\x7f\xf4\xf3\xddD\x1b\xb5\x00|\x16\x90\x83U(E\xfb\x8as"
-    import socket
+    logger.info("Started app")
     if socket.gethostname() == 'oisin':
         app.run(
             debug=False,

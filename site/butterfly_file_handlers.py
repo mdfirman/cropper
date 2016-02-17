@@ -5,6 +5,8 @@ import glob
 import time
 import collections
 import socket
+import logging
+logger = logging.getLogger()
 
 num_labellers_required_per_image = 3
 
@@ -81,9 +83,10 @@ def build_unlabelled_img_set(data_dir, yaml_name):
     # todo - after user submits, we need to add their name to the set and remove if needed
 
     if len(who_labelled_what) == 0:
-        print "No unlabelled images!"
+        logger.info("No unlabelled images!")
 
-    print "Took %fs to build unlabelled image set" % (time.time() - tic)
+    logger.info("Took %fs to build unlabelled image set" % (
+        time.time() - tic))
 
     return who_labelled_what
 
@@ -105,7 +108,7 @@ def get_user_counts(data_dir):
     # sorting users
     sorted_users = sorted(uname_counts.items(), key=operator.itemgetter(1))
 
-    print "Getting user counts took %fs" % (time.time() - tic)
+    logger.info("Getting user counts took %fs" % (time.time() - tic))
     return sorted_users
 
 
@@ -131,3 +134,12 @@ def getpaths(debug):
         raise Exception("Unknown host, expected 'oisin' or 'biryani'")
 
     return data_dir, yaml_name
+
+
+def logfilename():
+    ''' gets a path to a new log file '''
+    idx = 0
+    while os.path.exists('../data/logs/log_%05d.log' % idx):
+        idx += 1
+
+    return '../data/logs/log_%05d.log' % idx
