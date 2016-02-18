@@ -319,7 +319,7 @@ def login():
 
     # setting this here so new users are immediately taken to training
     if registered_user.done_training:
-        session['training_step'] = 7
+        session['training_step'] = 8
     else:
         session['training_step'] = 1
 
