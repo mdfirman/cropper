@@ -18,7 +18,7 @@ function bad_image()
 
 function cropped()
 {
-  return Number(document.getElementById("x").value) > 0;
+  return Number(document.getElementById("width").value) > 0;
 }
 
 function goodcropstep2()
