@@ -55,7 +55,8 @@ def build_unlabelled_img_set(data_dir, yaml_name):
         splitup = tmp.split('_')
         user = splitup[-2]
         img_id = '_'.join(splitup[:-2])
-        who_labelled_what[(sighting_id, img_id)]['labellers'].add(user)
+        if (sighting_id, img_id) in who_labelled_what:
+            who_labelled_what[(sighting_id, img_id)]['labellers'].add(user)
 
     # sort the dictionary by how many times each item has been labelled
     who_labelled_what = collections.OrderedDict(sorted(
@@ -103,7 +104,10 @@ def get_user_counts(data_dir):
     start = len(data_dir)
     for fname in fnames:
         username = fname[start:].split('_')[-2]
-        uname_counts[username] += 1
+        uname_counts[username.lower()] += 1
+
+    if 'mike' in uname_counts:
+        uname_counts['mike'] /= 4
 
     # sorting users
     sorted_users = sorted(uname_counts.items(), key=operator.itemgetter(1))
@@ -118,18 +122,19 @@ def getpaths(debug):
 
     if host == 'biryani':
         if debug:
-            data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_tmp_for_beta/'
+            data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_in_new_format/'
             yaml_name = 'butterflies_for_beta_website.yaml'
         else:
-            data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/butterfly_subset/'
-            yaml_name = 'butterflies.yaml'
+            data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_in_new_format/'
+            yaml_name = 'butterflies_3_to_10.yaml'
 
     elif host == 'oisin':
         if debug:
             data_dir = '/home/admin/butterflies/data/sightings/'
             yaml_name = 'butterflies_for_beta_website.yaml'
         else:
-            raise Exception('Not ready for the real thing yet')
+            data_dir = '/home/admin/butterflies/data/sightings/'
+            yaml_name = 'butterflies_3_to_10.yaml'
     else:
         raise Exception("Unknown host, expected 'oisin' or 'biryani'")
 

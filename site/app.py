@@ -33,7 +33,7 @@ app.register_blueprint(ck, url_prefix='/ck')
 app.jinja_env.add_extension("chartkick.ext.charts")
 
 # setting some constants
-debug = True
+debug = False
 training_debug = False
 if socket.gethostname() == 'oisin' and training_debug:
     raise Exception("Should not be allowed")
@@ -164,8 +164,6 @@ def cropper():
 def leaderboard():
     logging.info("Serving leaderboard")
     user_counts = get_user_counts(data_dir)
-    if user_counts:
-        user_counts.append(('Mark', max([xx for _, xx in user_counts]) + 10))
     user_counts = [[str(xx), float(yy)] for xx, yy in user_counts][::-1]
     return render_template('leaderboard.html', user_counts=user_counts)
 
