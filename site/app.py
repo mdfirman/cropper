@@ -110,7 +110,7 @@ def robots():
 @login_required
 def training():
 
-    if session['training_step'] <= 5:
+    if 'training_step' in session and session['training_step'] <= 5:
 
         logger.info("User %s on training step : %d" % (
             g.user.username, session['training_step']))
@@ -118,7 +118,7 @@ def training():
         return render_template('form_submit.html', sighting_id='', img_id='',
             training_step=session['training_step'])
 
-    elif session['training_step'] == 6:
+    elif 'training_step' in session and session['training_step'] == 6:
         session['training_step'] += 1
         return redirect(url_for('training'))
 
@@ -136,7 +136,7 @@ def training():
 def cropper():
     '''This is run the first time the page is loaded'''
 
-    if session['training_step'] < 6:
+    if 'training_step' in session and session['training_step'] < 6:
         if g.user.done_training:
             # ok, the user is allowed to quit
             session['training_step'] = 8
@@ -173,7 +173,12 @@ def leaderboard():
 def form_submission():
     '''This is run when the user clicks 'submit', with a POST request'''
 
+    # hoepfully help prevent those 500 messages
+    if 'training_step' not in session:
+        session['training_step'] = 0
+
     session['training_step'] += 1
+
     if session['training_step'] < 6:
         return redirect(url_for('training'))
 
