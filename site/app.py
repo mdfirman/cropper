@@ -346,7 +346,5 @@ if __name__ == '__main__':
             host="0.0.0.0",
             port=int("80")
         )
-    elif socket.gethostname() == 'biryani':
-        app.run(debug=True)
     else:
-        raise Exception("Unknown host")
+        app.run(debug=True)
