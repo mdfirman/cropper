@@ -33,8 +33,9 @@ app.register_blueprint(ck, url_prefix='/ck')
 app.jinja_env.add_extension("chartkick.ext.charts")
 
 # setting some constants
-debug = False
+debug = 'example_data'
 training_debug = False
+
 if socket.gethostname() == 'oisin' and training_debug:
     raise Exception("Should not be allowed")
 

@@ -1,0 +1,23 @@
+IdentifiedSpecies:
+- Large White (Pieris brassicae)
+ImageIds:
+- 2a9ccf2f2e964e1800b2657cecf6b3c3
+ImageURLs:
+- http://www.ispotnature.org/sites/default/files/imagecache/scaled/images/26193/2a9ccf2f2e964e1800b2657cecf6b3c3.jpg
+ObservedDate: 26th July 2013
+Title: Large White
+meta_tags:
+  agreements: '8'
+  comments: '0'
+  geolocation:latitude: '52.1985'
+  geolocation:longitude: '0.1417'
+  identifications: '1'
+  likely_id: Large White (Pieris brassicae)
+  location: 133, Mill Rd
+  observed: Friday 26th July 2013
+predictions:
+- agreements: 8
+  notes: ''
+  prediction: Large White (Pieris brassicae)
+  user: rkw1
+uploaded_by: rkw1

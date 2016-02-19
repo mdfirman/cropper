@@ -1,0 +1,31 @@
+IdentifiedSpecies:
+- Large White (Pieris brassicae)
+- Small White (Pieris rapae)
+ImageIds:
+- 6f234e0843bb5cf90d5e85a352e90e9f
+ImageURLs:
+- http://www.ispotnature.org/sites/default/files/imagecache/scaled/images/25851/6f234e0843bb5cf90d5e85a352e90e9f.jpg
+ObservedDate: 4th August 2013
+Title: Large White Butterfly
+meta_tags:
+  agreements: '3'
+  comments: '5'
+  geolocation:latitude: '54.531234834369'
+  geolocation:longitude: '-1.0667055164709'
+  identifications: '2'
+  likely_id: Large White (Pieris brassicae)
+  location: 61, Thames Ave
+  observed: Sunday 4th August 2013
+predictions:
+- agreements: 3
+  notes: ''
+  prediction: Large White (Pieris brassicae)
+  user: InToSpace
+- agreements: 0
+  notes: The black apical marking does not extend far down the edge of the wing. It
+    should extend to vein 3 for a large white - to at least below the upper black
+    spot. This gives the apical marking a rather curved appearance whereas the apical
+    markings in your picture are roughly triangular.
+  prediction: Small White (Pieris rapae)
+  user: Michael Funnell
+uploaded_by: InToSpace

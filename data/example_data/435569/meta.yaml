@@ -1,0 +1,23 @@
+IdentifiedSpecies:
+- Meadow Brown (Maniola jurtina)
+ImageIds:
+- 16886aa7afb13f1c927226d03eb95c9a
+ImageURLs:
+- http://www.ispotnature.org/sites/default/files/imagecache/scaled/images/16649/16886aa7afb13f1c927226d03eb95c9a.jpg
+ObservedDate: 12th July 2014
+Title: Meadow Brown
+meta_tags:
+  agreements: '6'
+  comments: '0'
+  geolocation:latitude: '53.633289337158'
+  geolocation:longitude: '-2.647157907486'
+  identifications: '1'
+  likely_id: Meadow Brown (Maniola jurtina)
+  location: Lower Burgh Meadow
+  observed: Saturday 12th July 2014
+predictions:
+- agreements: 6
+  notes: ''
+  prediction: Meadow Brown (Maniola jurtina)
+  user: Duxbury Rambler
+uploaded_by: Duxbury Rambler

@@ -1,0 +1,29 @@
+IdentifiedSpecies:
+- Meadow Brown (Maniola jurtina)
+ImageIds:
+- 3be8ce30bc501dee111c5f8352241ba6
+- 7631385bed7cc8ff687c5689b9b26082
+- 30fb7699355e760c2eac491a1a18f6da
+- cda49d7a0ce402182742a5cd6677da6d
+ImageURLs:
+- http://www.ispotnature.org/sites/default/files/imagecache/scaled/images/2149/3be8ce30bc501dee111c5f8352241ba6.jpg
+- http://www.ispotnature.org/sites/default/files/imagecache/scaled/images/2149/7631385bed7cc8ff687c5689b9b26082.jpg
+- http://www.ispotnature.org/sites/default/files/imagecache/scaled/images/2149/30fb7699355e760c2eac491a1a18f6da.jpg
+- http://www.ispotnature.org/sites/default/files/imagecache/scaled/images/2149/cda49d7a0ce402182742a5cd6677da6d.jpg
+ObservedDate: 15th July 2010
+Title: Meadow Brown
+meta_tags:
+  agreements: '8'
+  comments: '0'
+  geolocation:latitude: '51.216635863749'
+  geolocation:longitude: '-1.4931431533061'
+  identifications: '1'
+  likely_id: Meadow Brown (Maniola jurtina)
+  location: Anton Lakes,Andover
+  observed: Thursday 15th July 2010
+predictions:
+- agreements: 8
+  notes: ''
+  prediction: Meadow Brown (Maniola jurtina)
+  user: Graeme
+uploaded_by: Graeme

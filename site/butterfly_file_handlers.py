@@ -34,8 +34,7 @@ def build_unlabelled_img_set(data_dir, yaml_name):
     who_labelled_what = collections.OrderedDict()
 
     # find names of all the images in the collection
-    sighting_ids = yaml.load(
-        open(data_dir + '../' + yaml_name), Loader=yaml.CLoader)
+    sighting_ids = yaml.load(open(yaml_name), Loader=yaml.CLoader)
 
     for sighting_id, img_id, img_name in sighting_ids:
 
@@ -120,21 +119,25 @@ def getpaths(debug):
 
     host = socket.gethostname()
 
-    if host == 'biryani':
+    if debug == 'example_data':
+        data_dir = '../data/example_data/'
+        yaml_name = '../data/example_data/butterflies.yaml'
+
+    elif host == 'biryani':
         if debug:
             data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_in_new_format/'
-            yaml_name = 'butterflies_for_beta_website.yaml'
+            yaml_name = data_dir + '../butterflies_for_beta_website.yaml'
         else:
             data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_in_new_format/'
-            yaml_name = 'butterflies_3_to_10.yaml'
+            yaml_name = data_dir + '../butterflies_3_to_10.yaml'
 
     elif host == 'oisin':
         if debug:
             data_dir = '/home/admin/butterflies/data/sightings/'
-            yaml_name = 'butterflies_for_beta_website.yaml'
+            yaml_name = data_dir + '../butterflies_for_beta_website.yaml'
         else:
             data_dir = '/home/admin/butterflies/data/sightings/'
-            yaml_name = 'butterflies_3_to_10.yaml'
+            yaml_name = data_dir + '../butterflies_3_to_10.yaml'
     else:
         raise Exception("Unknown host, expected 'oisin' or 'biryani'")
 
