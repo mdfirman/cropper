@@ -39,7 +39,7 @@ training_debug = False
 if socket.gethostname() == 'oisin' and training_debug:
     raise Exception("Should not be allowed")
 
-num_labellers_required_per_image = 3
+num_labellers_required_per_image = 2
 data_dir, yaml_name = getpaths(debug)
 
 # creating the list of unlabelled images

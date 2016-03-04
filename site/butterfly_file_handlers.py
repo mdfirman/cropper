@@ -129,7 +129,7 @@ def getpaths(debug):
             yaml_name = data_dir + '../butterflies_for_beta_website.yaml'
         else:
             data_dir = '/media/michael/Engage/data/butterflies/web_scraping/ispot/sightings_in_new_format/'
-            yaml_name = data_dir + '../butterflies_3_to_10.yaml'
+            yaml_name = data_dir + '../butterflies_0_to_20.yaml'
 
     elif host == 'oisin':
         if debug:
