@@ -8,7 +8,7 @@ import socket
 import logging
 logger = logging.getLogger()
 
-num_labellers_required_per_image = 3
+num_labellers_required_per_image = 2
 
 
 def extract_latin_name(name):
@@ -40,6 +40,14 @@ def build_unlabelled_img_set(data_dir, yaml_name):
 
         # skip images with spaces, these are kind of broken
         if ' ' in img_id:
+            continue
+
+        # skip images which don't exist
+        if not os.path.exists(data_dir + sighting_id + '/' + img_name):
+            continue
+
+        # skip images with filesize zero
+        if os.path.getsize(data_dir + sighting_id + '/' + img_name) == 0:
             continue
 
         who_labelled_what[(sighting_id, img_id)] = {
@@ -137,7 +145,7 @@ def getpaths(debug):
             yaml_name = data_dir + '../butterflies_for_beta_website.yaml'
         else:
             data_dir = '/home/admin/butterflies/data/sightings/'
-            yaml_name = data_dir + '../butterflies_3_to_10.yaml'
+            yaml_name = data_dir + '../butterflies_0_to_20.yaml'
     else:
         raise Exception("Unknown host, expected 'oisin' or 'biryani'")
 

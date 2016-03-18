@@ -33,7 +33,7 @@ app.register_blueprint(ck, url_prefix='/ck')
 app.jinja_env.add_extension("chartkick.ext.charts")
 
 # setting some constants
-debug = 'example_data'
+debug = False
 training_debug = False
 
 if socket.gethostname() == 'oisin' and training_debug:
@@ -83,7 +83,7 @@ def remember_user_labelling(sighting_id, img_id, username):
     '''
     global unlabelled_imgs
 
-    unlabelled_imgs[(sighting_id, img_id)]['labellers'].add(username)
+    unlabelled_imgs[(str(sighting_id), str(img_id))]['labellers'].add(username)
 
     num_labellers = len(unlabelled_imgs[(sighting_id, img_id)]['labellers'])
 
@@ -220,10 +220,10 @@ def form_submission():
     sighting_id = request.form['sighting_id']
     img_id = request.form['img_id']
 
-    try:
-        savepath = data_dir + sighting_id + '/' + \
-            img_id.split('.')[0] + '_' + g.user.username + '_crop.yaml'
+    savepath = data_dir + sighting_id + '/' + \
+        img_id.split('.')[0] + '_' + g.user.username + '_crop.yaml'
 
+    try:
         remember_user_labelling(
             sighting_id, img_id.split('.')[0], g.user.username)
 
